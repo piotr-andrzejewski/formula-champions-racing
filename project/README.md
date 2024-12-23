@@ -27,6 +27,6 @@
   - VI miejsce: 1 pkt.
   - pozostałe miejsca: 0 pkt.
 - Podczas wyścigu mierzony jest czas zarówno każdego rozpoczętego okrążenia, jak i czas sumaryczny całego wyścigu.
-- Na podstawie zajętego miejsca w wyścigu, jak również czasu sumarycznego wyścigu graczowi przyznawany jest wynik,
+- Po wyścigu, na podstawie czasu sumarycznego, zajętego miejsca, poziomu przeciwników, wybranych zasad wyścigowych oraz bolidu, graczowi przyznawany jest wynik,
  który trafia na tablicę wyników.
 - Na tablicy wyników wyświetlanych jest 10 najlepszych wyników.
