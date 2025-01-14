@@ -1,17 +1,23 @@
 # main game
+import time
 
 import pygame
 
 from pygame import Surface
 
 from cars import ComputerCar, PlayerCar
-from images import CAR_2, CUP, FINISH_LINE, TRACK_HUNGARY, TRACK_LIMITS_HUNGARY
+from images import CAR_2, CUP, FINISH_LINE, TRACK_1, TRACK_1_LIMITS
 
+# create font for on screen messages
+pygame.font.init()
+GAME_FONT = pygame.font.SysFont('Space Bd BT', 36)
 
 # create game window
 GAME_WINDOW = pygame.display.set_mode((800, 800))
+GAME_WINDOW.fill((0, 50, 0))
 pygame.display.set_caption('Formula Champions Racing')
 pygame.display.set_icon(CUP)
+# GAME_FONT.render('START', True, (255, 255, 255), (0, 0, 0))
 
 
 def draw(window: pygame.display, images: list[tuple[Surface, (int, int)]], player: PlayerCar) -> None:
@@ -60,36 +66,29 @@ def move_player(player: PlayerCar) -> None:
 # set frames per second parameter
 FPS = 60
 
-# TODO: update PATH for better experience
-PATH = [
-(350, 762), (329, 762), (284, 764), (206, 763), (122, 764), (82, 757), (66, 738), (95, 700), (171, 667), (260, 663), (332, 659), (366, 645), (373, 618), (314, 575), (282, 535), (269, 490), (248, 425), (225, 314), (222, 260), (207, 214), (156, 166), (102, 117), (98, 80), (165, 52), (250, 50), (318, 76), (345, 118), (416, 165), (481, 142), (541, 159), (580, 222), (658, 280), (726, 319), (726, 415), (723, 542), (712, 610), (626, 610), (536, 620), (562, 661), (675, 674), (686, 748), (598, 761), (466, 759), (404, 758)
-# (185, 760), (66, 750), (91, 683), (250, 658), (364, 651), (358, 594), (265, 510), (226, 292), (192, 192), (98, 120), (142, 57), (272, 58), (389, 154), (478, 149), (569, 200), (661, 285), (730, 386), (721, 562), (688, 617), (569, 610), (569, 659), (677, 666), (674, 750), (514, 766), (341, 760)
-]
-
 run = True
 clock = pygame.time.Clock()
 
-TRACK_HUNGARY_POSITION = (-40, -20)
-TRACK_LIMITS_HUNGARY_POSITION = (5, 1)
-FINISH_LINE_POSITION = (508, 748)
+TRACK_1_POSITION = (10, 10)
+TRACK_1_LIMITS_POSITION = (10, 10)
+FINISH_LINE_POSITION = (535, 762)
 
 game_images = [
-    (TRACK_HUNGARY, TRACK_HUNGARY_POSITION),
-    (TRACK_LIMITS_HUNGARY, TRACK_LIMITS_HUNGARY_POSITION),
+    (TRACK_1_LIMITS, TRACK_1_LIMITS_POSITION),
+    (TRACK_1, TRACK_1_POSITION),
     (FINISH_LINE, FINISH_LINE_POSITION)
 ]
 
-track_limits_hungary_mask = pygame.mask.from_surface(TRACK_LIMITS_HUNGARY)
+track_1_limits_mask = pygame.mask.from_surface(TRACK_1_LIMITS)
 finish_line_mask = pygame.mask.from_surface(FINISH_LINE)
 
 player_car = PlayerCar()
-computer_car_1 = ComputerCar(max_vel=2.0, rotation_vel=6.0, img=CAR_2, path=PATH)
+computer_car_1 = ComputerCar(max_vel=1.1, img=CAR_2)
 
 player_completed_laps = 0
 player_crossed_line = False
 computer_car_1_completed_laps = 0
 computer_car_1_crossed_line = False
-
 
 # main event loop for the game
 while run:
@@ -97,6 +96,7 @@ while run:
     clock.tick(FPS)
 
     draw(GAME_WINDOW, game_images, player_car)
+    # pressed_keys = pygame.key.get_pressed()
 
     for event in pygame.event.get():
         # check the event of user clicking 'X' button to close the game window
@@ -104,17 +104,33 @@ while run:
             run = False
             break
 
-        # code to generate points for computer car path
+        # # code to generate points for computer car path
+        # if event.type == pygame.KEYDOWN:
+        #     if pressed_keys[pygame.K_x]:
+        #         # display player position to better tune computer car's path
+        #         print((player_car.x, player_car.y))
+        #
+        # # code to get coordinates of mouse position
+        # mouse_pos = pygame.mouse.get_pos()
+        # print(mouse_pos)
+        #
         # if event.type == pygame.MOUSEBUTTONDOWN:
-        #     mouse_pos = pygame.mouse.get_pos()
         #     computer_car_1.path.append(mouse_pos)
+        #
+        # if event.type == pygame.KEYDOWN:
+        #     if pressed_keys[pygame.K_c]:
+        #         computer_car_1.path.pop()
 
     move_player(player_car)
-    computer_car_1.move()
+
+    # if pressed_keys[pygame.K_SPACE]:
+    #     computer_car_1.path.append((player_car.x, player_car.y))
+
+    computer_car_1.draw(GAME_WINDOW)
 
     # TODO: handle track limits for potential penalties when player turns on such option
-    # if player_car.collide(track_limits_hungary_mask, *TRACK_LIMITS_HUNGARY_POSITION) is not None:
-    #     print("collide")
+    if player_car.collide(track_1_limits_mask, *TRACK_1_LIMITS_POSITION) is None:
+        print("get back to track")
 
     computer_car_1_finish_line_poi = computer_car_1.collide(finish_line_mask, *FINISH_LINE_POSITION)
 
@@ -142,9 +158,6 @@ while run:
             player_completed_laps += 1
             player_crossed_line = False
             print("Lap completed")
-
-    # display player position to better tune computer car's path
-    # print((player_car.x, player_car.y))
 
 print("Laps completed:")
 print("Player: ", player_completed_laps)
