@@ -7,7 +7,7 @@ import numpy
 from scipy.interpolate import CubicSpline
 from pygame import Mask, Surface
 
-from images import CAR_1
+from images import CAR_1, CAR_2, CAR_3, CAR_4, CAR_5, CAR_6, CAR_7, CAR_8
 from utils import blit_rotate_center
 
 TRACK_1_P1 = (380, 772)
@@ -29,7 +29,7 @@ TRACK_1_PATH = [
     (730, 621), (650, 608), (582, 610), (550, 647), (622, 675),
     (694, 672), (746, 705), (723, 767), (624, 778), (455, 773)
 ]
-TRACK_1_PATH_POINT_MARGIN = 2
+TRACK_1_PATH_POINT_MARGIN = 10
 
 class BaseCar:
     IMG = CAR_1
@@ -37,14 +37,16 @@ class BaseCar:
     MAX_VEL = 2.5
     ROTATION_VEL = 2.3
 
-    def __init__(self, max_vel: float=MAX_VEL, rotation_vel: float=ROTATION_VEL) -> None:
+    def __init__(self) -> None:
         self.img = self.IMG
-        self.max_vel = max_vel
+        self.max_vel = self.MAX_VEL
         self.vel = 0
-        self.rotation_vel = rotation_vel
+        self.rotation_vel = self.ROTATION_VEL
         self.angle = 90
         self.x, self.y = self.START_POS
         self.acceleration = 0.1
+        self.completed_laps = 0
+        self.crossed_line = False
 
     def rotate(self, left=False, right=False) -> None:
         if left:
@@ -75,21 +77,47 @@ class BaseCar:
         car_mask = pygame.mask.from_surface(self.img)
         offset = (int(self.x - x), int(self.y - y))
         poi = mask.overlap(car_mask, offset)
+
         return poi
+
+    def reset(self) -> None:
+        self.x, self.y = self.START_POS
+        self.angle = 90
+        self.vel = 0
+        self.completed_laps = 0
+        self.crossed_line = False
+
+
+def calculate_vel_factor(img: Surface) -> float:
+    if img == CAR_1:
+        return 0.96
+    elif img == CAR_2:
+        return 0.96
+    elif img == CAR_3:
+        return 1
+    elif img == CAR_4:
+        return 0.93
+    elif img == CAR_5:
+        return 0.98
+    elif img == CAR_6:
+        return 0.9
+    elif img == CAR_7:
+        return 0.91
+    elif img == CAR_8:
+        return 0.93
 
 
 class PlayerCar(BaseCar):
     def __init__(
             self,
-            max_vel: float=BaseCar.MAX_VEL,
-            rotation_vel: float=BaseCar.ROTATION_VEL,
             img: Surface=BaseCar.IMG,
-            start_pos: tuple[int, int]=BaseCar.START_POS
+            start_pos: tuple[float, float]=BaseCar.START_POS
     ) -> None:
-        super().__init__(max_vel, rotation_vel)
-
+        super().__init__()
         self.img = img
         self.x, self.y = start_pos
+        self.max_vel *= calculate_vel_factor(self.img)
+        self.rotation_vel *= calculate_vel_factor(self.img)
 
     def brake(self) -> None:
         self.vel = max(self.vel - self.acceleration, 0)
@@ -99,23 +127,25 @@ class PlayerCar(BaseCar):
         self.vel = max(self.vel - self.acceleration / 3, 0)
         self.move()
 
-    def reset(self) -> None:
+    def reset_position(self) -> None:
         self.x, self.y = TRACK_1_RESET_POSITION
         self.angle = 90
         self.vel = 0
 
 
 class ComputerCar(BaseCar):
+    MAX_VEL = 2.2
+
     def __init__(
-            self, max_vel: float=BaseCar.MAX_VEL,
+            self,
             img: Surface=BaseCar.IMG,
-            start_pos: tuple[int, int]=TRACK_1_P2
+            start_pos: tuple[float, float]=TRACK_1_P2
     ) -> None:
-        super().__init__(max_vel)
+        super().__init__()
 
         self.path = TRACK_1_PATH
         self.current_point = 0
-        self.vel = max_vel
+        self.vel = self.MAX_VEL * calculate_vel_factor(img)
         self.img = pygame.transform.rotate(img, -90)
         self.x, self.y = start_pos
         self.smooth_direction = (0, 0)
@@ -149,13 +179,6 @@ class ComputerCar(BaseCar):
             if math.hypot(target_x - self.x, target_y - self.y) < TRACK_1_PATH_POINT_MARGIN:
                 self.current_point += 1
 
-    def draw(self, window: pygame.display) -> None:
-        self.update_path_point(self.smooth_path())
-        super().draw(window)
-
-        # # use of helper function to display path points
-        # self.draw_points(window)
-
     # function to interpolate path with cubic splines to make more smooth path to follow
     def smooth_path(self) -> list[tuple[float, float]]:
         # extract x and y coordinates from points in path
@@ -168,7 +191,14 @@ class ComputerCar(BaseCar):
 
         return list(zip(cubic_spline_x(smooth_points), cubic_spline_y(smooth_points)))
 
-    # # helper function to draw points of computer car's path
+    def draw(self, window: pygame.display) -> None:
+        self.update_path_point(self.smooth_path())
+        super().draw(window)
+
+        # # use of helper function to display path points
+        # self.draw_points(window)
+
+    # helper function to draw points of computer car's path
     # def draw_points(self, window: pygame.display) -> None:
     #     for point in self.path:
     #         pygame.draw.circle(window, (255, 0, 0), point, 2)
@@ -201,9 +231,8 @@ class ComputerCar(BaseCar):
     #     rect = pygame.Rect(self.x, self.y, self.img.get_width(), self.img.get_height())
     #
     #     if rect.center == target:
-    #         # time.sleep(0.2)
     #         self.current_point += 1
-
+    #
     # def move(self) -> None:
     #     if self.current_point >= len(self.path):
     #         return

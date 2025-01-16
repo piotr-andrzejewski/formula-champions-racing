@@ -4,18 +4,16 @@ import pygame
 
 from utils import scale_image
 
+TRACK_1 = scale_image(pygame.image.load('./assets/track1.png'), 1.3)
+TRACK_1_LIMITS = scale_image(pygame.image.load('./assets/track1_limits.png'), 1.3)
+TRACK_1_TILE = scale_image(pygame.image.load('./assets/track1_tile.png'), 0.4)
 TRACK_BRAZIL_TILE = pygame.image.load('./assets/track_brazil_tile.png')
 TRACK_BRAZIL = pygame.image.load('./assets/track_brazil.png')
 TRACK_LIMITS_BRAZIL = pygame.image.load('./assets/track_brazil_limits.png')
-TRACK_HUNGARY_TILE = pygame.image.load('./assets/track_hungary_tile.png')
-TRACK_HUNGARY = scale_image(pygame.image.load('./assets/track_hungary.png'), 0.2)
-TRACK_LIMITS_HUNGARY = scale_image(pygame.image.load('./assets/track_hungary_limits.png'), 0.2)
 TRACK_ITALY_TILE = pygame.image.load('./assets/track_italy_tile.png')
 TRACK_ITALY = pygame.image.load('./assets/track_italy.png')
 TRACK_LIMITS_ITALY = pygame.image.load('./assets/track_italy_limits.png')
 
-TRACK_1 = scale_image(pygame.image.load('./assets/track1.png'), 1.3)
-TRACK_1_LIMITS = scale_image(pygame.image.load('./assets/track1_limits.png'), 1.3)
 
 CAR_1 = pygame.image.load('./assets/car1.png')
 CAR_2 = pygame.image.load('./assets/car2.png')
