@@ -165,7 +165,7 @@ class ComputerCar(BaseCar):
 
         self.path = TRACK_1_PATH
         self.current_point = 0
-        self.vel = (self.MAX_VEL - 1 + level / 100) * calculate_vel_factor(img)
+        self.vel = (self.MAX_VEL - 0.7 + level / 5) * calculate_vel_factor(img)
         self.img = pygame.transform.rotate(img, -90)
         self.x, self.y = start_pos
         self.smooth_direction = (0, 0)

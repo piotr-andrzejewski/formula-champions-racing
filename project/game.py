@@ -163,6 +163,7 @@ def generate_path_for_computer_car() -> None:
 
 def get_best_lap() -> None:
     PLAYER.find_best_lap()
+
     if PLAYER.best_lap is not None:
         print(f"Best lap: {PLAYER.best_lap}")
 
@@ -170,10 +171,12 @@ class Game:
     def __init__(self) -> None:
         self.game_started = False
         self.game_start_time = 0.0
+        self.game_total_time = 0.0
 
     def reset(self) -> None:
         self.game_started = False
         self.game_start_time = 0.0
+        self.game_total_time = 0.0
         PLAYER.score = 0
         PLAYER.final_position = 1
         PLAYER.lap_start_time = 0.0
@@ -183,11 +186,9 @@ class Game:
         self.game_started = True
         self.game_start_time = time.time_ns() / mili
 
-    def get_total_time(self) -> float:
-        if not self.game_started:
-            return 0
-
-        return round(time.time_ns() / mili - self.game_start_time)
+    def get_game_total_time(self) -> None:
+        self.game_total_time = round(time.time_ns() / mili - self.game_start_time)
+        print(f"Total time: {self.game_total_time}")
 
     def run(self) -> None:
         self.start_game()
@@ -219,7 +220,7 @@ class Game:
             # # code to display computer car's path in console to be able to copy it for PATH variable
             # print(computers[i].path)
 
-        print(f"Total time: {self.get_total_time()}")
+        self.get_game_total_time()
         get_best_lap()
 
 
