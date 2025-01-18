@@ -5,10 +5,10 @@ from pygame import Surface
 from images import TRACK_1
 
 TRACKS = [TRACK_1]
-RACE_RULES = {"track_cutting": False, "collisions": False}
+RACE_RULES = {'track_cutting': False, 'collisions': False}
 
 
-class GameSettings:
+class Settings:
     def __init__(
             self,
             track: Surface = TRACKS[0],
@@ -27,3 +27,13 @@ class GameSettings:
         self.opponents_level = opponents_level
         self.starting_position = start_pos
         self.race_rules = race_rules
+
+    # def get_settings(self) -> dict[str, Surface | int | int | int | int | None | dict[str, bool]]:
+    #     return {
+    #         'track': self.selected_track,
+    #         'laps': self.selected_laps,
+    #         'opponents': self.opponents,
+    #         'level': self.opponents_level,
+    #         'start_pos': self.starting_position,
+    #         'race_rules': self.race_rules
+    #     }
