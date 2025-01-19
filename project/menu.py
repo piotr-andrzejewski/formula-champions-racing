@@ -317,12 +317,14 @@ class Menu:
 
                         if index_of_current_starting_position > 0:
                             settings.starting_position = STARTING_POSITIONS[index_of_current_starting_position - 1]
+                            settings.selected_starting_position = STARTING_POSITIONS[index_of_current_starting_position - 1]
 
                     if buttons['select_starting_position_next_button'].check_for_input(menu_mouse_pos):
                         index_of_current_starting_position = STARTING_POSITIONS.index(settings.starting_position)
 
                         if index_of_current_starting_position < len(STARTING_POSITIONS) - 1:
                             settings.starting_position = STARTING_POSITIONS[index_of_current_starting_position + 1]
+                            settings.selected_starting_position = STARTING_POSITIONS[index_of_current_starting_position + 1]
 
                     if buttons['back_button'].check_for_input(menu_mouse_pos):
                         self.back_to_main_menu()
@@ -350,7 +352,7 @@ class Menu:
         self.create_text(SELECTION_FONT_SIZE, 'OPPONENTS LEVEL', position=(450, 500), positioning='midright')
         self.create_text(SELECTION_FONT_SIZE, str(settings.opponents_level), position=(600, 500))
         self.create_text(SELECTION_FONT_SIZE, 'STARTING POSITION', position=(450, 550), positioning='midright')
-        self.create_text(SELECTION_FONT_SIZE, str(settings.starting_position), position=(600, 550))
+        self.create_text(SELECTION_FONT_SIZE, str(settings.selected_starting_position), position=(600, 550))
 
     # create text positioned by its center
     def create_text(

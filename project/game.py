@@ -1,13 +1,10 @@
 # main game
 import sys
 
-import pygame
 import time
 
-from pygame import Surface
-
 from cars import *
-from images import CAR_1, CAR_2, CAR_3, CAR_4, CAR_5, CAR_6, CAR_7, CAR_8, CUP, FINISH_LINE, TRACK_1, TRACK_1_LIMITS
+from images import FINISH_LINE, TRACK_1_LIMITS
 from settings import *
 
 mili = 1000
@@ -56,7 +53,7 @@ class Game:
         self.player.lap_start_time = 0.0
         self.player.lap_times = []
         self.player.best_lap = None
-        self.settings.occupied_starting_positions = [self.settings.starting_position]
+        self.settings.occupied_starting_positions = []
 
         for opponent in self.opponents:
             opponent.reset()
@@ -71,7 +68,11 @@ class Game:
         for i in range(self.settings.opponents):
             computer_car = get_opponent_car(occupied_cars)
             opponents.append(
-                ComputerCar(img=computer_car, start_pos=self.settings.get_opponent_starting_track_position())
+                ComputerCar(
+                    img=computer_car,
+                    level=self.settings.opponents_level,
+                    start_pos=self.settings.get_opponent_starting_track_position()
+                )
             )
             occupied_cars.append(computer_car)
 
