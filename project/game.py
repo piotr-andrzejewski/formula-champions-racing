@@ -6,9 +6,9 @@ import time
 
 from pygame import Surface
 
-from cars import generate_player, generate_opponents
+from cars import *
 from images import CAR_1, CAR_2, CAR_3, CAR_4, CAR_5, CAR_6, CAR_7, CAR_8, CUP, FINISH_LINE, TRACK_1, TRACK_1_LIMITS
-from settings import Settings
+from settings import *
 
 mili = 1000
 
@@ -41,12 +41,16 @@ FINISH_LINE_MASK = pygame.mask.from_surface(FINISH_LINE)
 # COMPUTERS = generate_opponents()
 
 
+def calculate_starting_position(track: str, position: int) -> tuple[float, float]:
+    return
+
+
 class Game:
-    def __init__(self, game_window: Surface) -> None:
+    def __init__(self, game_window: Surface, settings: Settings) -> None:
         self.game_window = game_window
-        self.settings = Settings()
-        self.player = generate_player()
-        self.opponents = generate_opponents()
+        self.settings = settings
+        self.player = self.generate_player()
+        self.opponents = self.generate_opponents()
         self.started = False
         self.game_start_time = 0.0
         self.game_total_time = 0.0
@@ -65,6 +69,30 @@ class Game:
         for opponent in self.opponents:
             opponent.reset()
 
+    def generate_player(self) -> PlayerCar:
+        return PlayerCar(img=self.settings.selected_car, start_pos=self.settings.get_player_starting_position())
+
+    def generate_opponents(self) -> list[ComputerCar]:
+        # occupied_track_positions = {
+        #     create_track_position_name(self.settings.selected_track_name, self.settings.starting_position):
+        #         self.settings.get_player_starting_position(),
+        # }
+        #
+        # available_track_positions = []
+        #
+        # for i in range(self.settings.opponents + 1):
+
+
+        return [
+            ComputerCar(img=CAR_2, start_pos=TRACK_POSITIONS['TRACK_1_P2']),
+            ComputerCar(img=CAR_3, start_pos=TRACK_POSITIONS['TRACK_1_P3']),
+            ComputerCar(img=CAR_4, start_pos=TRACK_POSITIONS['TRACK_1_P4']),
+            ComputerCar(img=CAR_5, start_pos=TRACK_POSITIONS['TRACK_1_P5']),
+            ComputerCar(img=CAR_6, start_pos=TRACK_POSITIONS['TRACK_1_P6']),
+            ComputerCar(img=CAR_7, start_pos=TRACK_POSITIONS['TRACK_1_P7']),
+            ComputerCar(img=CAR_8, start_pos=TRACK_POSITIONS['TRACK_1_P8'])
+        ]
+
     def start_game(self) -> None:
         self.game_window.fill((0, 50, 0))
         self.started = True
@@ -78,11 +106,11 @@ class Game:
 
         for i in range(len(self.opponents)):
             print(f'Opponent {i + 1}: ', self.opponents[i].completed_laps)
+
             # # code to display computer car's path in console to be able to copy it for PATH variable
             # print(opponents[i].path)
 
         self.reset()
-        pygame.quit()
 
     def get_game_total_time(self) -> None:
         self.game_total_time = round(time.time_ns() / mili - self.game_start_time)
@@ -93,15 +121,20 @@ class Game:
 
         # main loop for the game
         while self.started:
+
             # set max fps for the game
             CLOCK.tick(FPS)
-            mouse_pos = pygame.mouse.get_pos()
+            # mouse_pos = pygame.mouse.get_pos()
 
             for event in pygame.event.get():
+
                 # check the event of user clicking 'X' button to close the game window
                 if event.type == pygame.QUIT:
                     self.end_game()
                     sys.exit()
+
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    self.end_game()
 
                 # if event.type == pygame.MOUSEBUTTONDOWN:
                 #     print(mouse_pos)
@@ -115,7 +148,6 @@ class Game:
 
             if self.player.completed_laps == self.settings.selected_laps:
                 self.end_game()
-                break
 
             pygame.display.update()
 
@@ -165,6 +197,7 @@ class Game:
                     self.player.rotate(right=True)
 
     def handle_collisions(self) -> None:
+
         # TODO: handle track limits for potential penalties when player turns on such option
         if self.player.collide(TRACK_1_LIMITS_MASK, *TRACK_1_LIMITS_POSITION) is None:
             print('Get back to track')
@@ -209,6 +242,7 @@ class Game:
             # code to generate points for computer car path
             if event.type == pygame.KEYDOWN:
                 if pressed_keys[pygame.K_x]:
+
                     # display player position to better tune computer car's path
                     print((self.player.x_pos, self.player.y_pos))
 

@@ -11,30 +11,34 @@ from images import CAR_1, CAR_2, CAR_3, CAR_4, CAR_5, CAR_6, CAR_7, CAR_8
 from utils import blit_rotate_center
 
 # constants
-TRACK_1_P1 = (380.0, 772)
-TRACK_1_P2 = (400.0, 758.5)
-TRACK_1_P3 = (420.0, 772)
-TRACK_1_P4 = (440.0, 758.5)
-TRACK_1_P5 = (460.0, 772)
-TRACK_1_P6 = (480.0, 758.5)
-TRACK_1_P7 = (500.0, 772)
-TRACK_1_P8 = (520.0, 758.5)
-TRACK_1_RESET_POSITION = (528.5, 758.5)
-TRACK_1_PATH = [
-    (234.0, 774.0), (71.0, 773.0), (26.0, 744.0), (96.0, 686.0), (200.0, 670.0),
-    (332.0, 668.0), (377.0, 642.0), (363.0, 598.0), (286.0, 557.0), (241.0, 405.0),
-    (211.0, 250.0), (169.0, 168.0), (74.0, 98.0), (105.0, 30.0), (182.0, 16.0), (290.0, 32.0),
-    (328.0, 75.0), (416.0, 150.0), (492.0, 126.0), (554.0, 128.0), (598.0, 189.0),
-    (658.0, 251.0), (751.0, 290.0), (774.0, 366.0), (766.0, 526.0), (759.0, 597.0),
-    (730.0, 621.0), (650.0, 608.0), (582.0, 610.0), (550.0, 647.0), (622.0, 675.0),
-    (694.0, 672.0), (746.0, 705.0), (723.0, 767.0), (624.0, 778.0), (455.0, 773.0)
-]
-TRACK_1_PATH_POINT_MARGIN = 20.0
+TRACK_POSITIONS = {
+    'TRACK_1_P1': (380.0, 772),
+    'TRACK_1_P2': (400.0, 758.5),
+    'TRACK_1_P3': (420.0, 772),
+    'TRACK_1_P4': (440.0, 758.5),
+    'TRACK_1_P5': (460.0, 772),
+    'TRACK_1_P6': (480.0, 758.5),
+    'TRACK_1_P7': (500.0, 772),
+    'TRACK_1_P8': (520.0, 758.5),
+    'TRACK_1_RESET_POSITION': (528.5, 758.5)
+}
+TRACK_PATHS = {
+    'TRACK_1_PATH': [
+        (234.0, 774.0), (71.0, 773.0), (26.0, 744.0), (96.0, 686.0), (200.0, 670.0),
+        (332.0, 668.0), (377.0, 642.0), (363.0, 598.0), (286.0, 557.0), (241.0, 405.0),
+        (211.0, 250.0), (169.0, 168.0), (74.0, 98.0), (105.0, 30.0), (182.0, 16.0), (290.0, 32.0),
+        (328.0, 75.0), (416.0, 150.0), (492.0, 126.0), (554.0, 128.0), (598.0, 189.0),
+        (658.0, 251.0), (751.0, 290.0), (774.0, 366.0), (766.0, 526.0), (759.0, 597.0),
+        (730.0, 621.0), (650.0, 608.0), (582.0, 610.0), (550.0, 647.0), (622.0, 675.0),
+        (694.0, 672.0), (746.0, 705.0), (723.0, 767.0), (624.0, 778.0), (455.0, 773.0)
+    ]
+}
+PATH_POINT_MARGIN = 20.0
 
 
 class BaseCar:
     IMG = CAR_1
-    START_POS = TRACK_1_P1
+    START_POS = TRACK_POSITIONS['TRACK_1_P1']
     MAX_VEL = 3.0
 
     def __init__(self) -> None:
@@ -135,7 +139,7 @@ class PlayerCar(BaseCar):
         self.move()
 
     def reset_position(self) -> None:
-        self.x_pos, self.y_pos = TRACK_1_RESET_POSITION
+        self.x_pos, self.y_pos = TRACK_POSITIONS['TRACK_1_RESET_POSITION']
         self.angle = 90.0
         self.vel = 0.0
 
@@ -159,11 +163,11 @@ class ComputerCar(BaseCar):
             self,
             img: Surface = BaseCar.IMG,
             level: int = LEVEL,
-            start_pos: tuple[float, float] = TRACK_1_P2
+            start_pos: tuple[float, float] = TRACK_POSITIONS['TRACK_1_P2']
     ) -> None:
         super().__init__()
 
-        self.path = TRACK_1_PATH
+        self.path = TRACK_PATHS['TRACK_1_PATH']
         self.current_point = 0
         self.vel = (self.MAX_VEL - 0.7 + level / 5) * calculate_vel_factor(img)
         self.img = pygame.transform.rotate(img, -90)
@@ -175,6 +179,7 @@ class ComputerCar(BaseCar):
         super().reset()
 
     def move_towards(self, target_x: float, target_y: float) -> None:
+
         # calculate the direction vector and distance
         direction = (target_x - self.x_pos, target_y - self.y_pos)
         distance = math.hypot(*direction)
@@ -200,11 +205,12 @@ class ComputerCar(BaseCar):
             self.move_towards(target_x, target_y)
 
             # checking if hypotenuse is smaller than desired margin to move to the next path point
-            if math.hypot(target_x - self.x_pos, target_y - self.y_pos) < TRACK_1_PATH_POINT_MARGIN:
+            if math.hypot(target_x - self.x_pos, target_y - self.y_pos) < PATH_POINT_MARGIN:
                 self.current_point += 1
 
     # function to interpolate path with cubic splines to make more smooth path to follow
     def smooth_path(self) -> list[tuple[float, float]]:
+
         # extract x and y coordinates from points in path
         pos_x, pos_y = zip(*self.path)
 
@@ -226,19 +232,3 @@ class ComputerCar(BaseCar):
     # def draw_points(self, window: Surface) -> None:
     #     for point in self.path:
     #         pygame.draw.circle(window, (255, 0, 0), point, 2)
-
-
-def generate_player() -> PlayerCar:
-    return PlayerCar(img=CAR_1, start_pos=TRACK_1_P1)
-
-
-def generate_opponents() -> list[ComputerCar]:
-    return [
-        ComputerCar(img=CAR_2, start_pos=TRACK_1_P2),
-        ComputerCar(img=CAR_3, start_pos=TRACK_1_P3),
-        ComputerCar(img=CAR_4, start_pos=TRACK_1_P4),
-        ComputerCar(img=CAR_5, start_pos=TRACK_1_P5),
-        ComputerCar(img=CAR_6, start_pos=TRACK_1_P6),
-        ComputerCar(img=CAR_7, start_pos=TRACK_1_P7),
-        ComputerCar(img=CAR_8, start_pos=TRACK_1_P8)
-    ]
