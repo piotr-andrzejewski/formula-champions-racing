@@ -43,10 +43,6 @@ def create_game_screen(width: int, height: int) -> Surface:
     return game_screen
 
 
-# def get_pressed_keys() -> ScancodeWrapper:
-#     return pygame.key.get_pressed()
-
-
 class Button:
     def __init__(
             self,

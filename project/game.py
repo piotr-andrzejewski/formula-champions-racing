@@ -35,15 +35,6 @@ GAME_IMAGES = [
 TRACK_1_LIMITS_MASK = pygame.mask.from_surface(TRACK_1_LIMITS)
 FINISH_LINE_MASK = pygame.mask.from_surface(FINISH_LINE)
 
-# # initialize required classes
-# SETTINGS = Settings()
-# PLAYER = generate_player()
-# COMPUTERS = generate_opponents()
-
-
-def calculate_starting_position(track: str, position: int) -> tuple[float, float]:
-    return
-
 
 class Game:
     def __init__(self, game_window: Surface, settings: Settings) -> None:
@@ -65,33 +56,26 @@ class Game:
         self.player.lap_start_time = 0.0
         self.player.lap_times = []
         self.player.best_lap = None
+        self.settings.occupied_starting_positions = [self.settings.starting_position]
 
         for opponent in self.opponents:
             opponent.reset()
 
     def generate_player(self) -> PlayerCar:
-        return PlayerCar(img=self.settings.selected_car, start_pos=self.settings.get_player_starting_position())
+        return PlayerCar(img=self.settings.selected_car, start_pos=self.settings.get_player_starting_track_position())
 
     def generate_opponents(self) -> list[ComputerCar]:
-        # occupied_track_positions = {
-        #     create_track_position_name(self.settings.selected_track_name, self.settings.starting_position):
-        #         self.settings.get_player_starting_position(),
-        # }
-        #
-        # available_track_positions = []
-        #
-        # for i in range(self.settings.opponents + 1):
+        occupied_cars = [self.settings.selected_car]
+        opponents = []
 
+        for i in range(self.settings.opponents):
+            computer_car = get_opponent_car(occupied_cars)
+            opponents.append(
+                ComputerCar(img=computer_car, start_pos=self.settings.get_opponent_starting_track_position())
+            )
+            occupied_cars.append(computer_car)
 
-        return [
-            ComputerCar(img=CAR_2, start_pos=TRACK_POSITIONS['TRACK_1_P2']),
-            ComputerCar(img=CAR_3, start_pos=TRACK_POSITIONS['TRACK_1_P3']),
-            ComputerCar(img=CAR_4, start_pos=TRACK_POSITIONS['TRACK_1_P4']),
-            ComputerCar(img=CAR_5, start_pos=TRACK_POSITIONS['TRACK_1_P5']),
-            ComputerCar(img=CAR_6, start_pos=TRACK_POSITIONS['TRACK_1_P6']),
-            ComputerCar(img=CAR_7, start_pos=TRACK_POSITIONS['TRACK_1_P7']),
-            ComputerCar(img=CAR_8, start_pos=TRACK_POSITIONS['TRACK_1_P8'])
-        ]
+        return opponents
 
     def start_game(self) -> None:
         self.game_window.fill((0, 50, 0))

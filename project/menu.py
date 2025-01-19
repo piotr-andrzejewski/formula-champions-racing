@@ -5,7 +5,7 @@ import random
 from pygame import Surface
 
 from game import Game
-from settings import Settings, CARS, TRACKS, LAPS, OPPONENTS, OPPONENTS_LEVEL, STARTING_POSITION, CAR_NAMES, TRACK_NAMES
+from settings import Settings, CARS, TRACKS, LAPS, OPPONENTS, OPPONENTS_LEVEL, STARTING_POSITIONS, CAR_NAMES, TRACK_NAMES
 from utils import Button, blit_screen, get_font
 
 
@@ -313,16 +313,16 @@ class Menu:
                             settings.opponents_level = OPPONENTS_LEVEL[index_of_current_opponents_level + 1]
 
                     if buttons['select_starting_position_previous_button'].check_for_input(menu_mouse_pos):
-                        index_of_current_starting_position = STARTING_POSITION.index(settings.starting_position)
+                        index_of_current_starting_position = STARTING_POSITIONS.index(settings.starting_position)
 
                         if index_of_current_starting_position > 0:
-                            settings.starting_position = STARTING_POSITION[index_of_current_starting_position - 1]
+                            settings.starting_position = STARTING_POSITIONS[index_of_current_starting_position - 1]
 
                     if buttons['select_starting_position_next_button'].check_for_input(menu_mouse_pos):
-                        index_of_current_starting_position = STARTING_POSITION.index(settings.starting_position)
+                        index_of_current_starting_position = STARTING_POSITIONS.index(settings.starting_position)
 
-                        if index_of_current_starting_position < len(STARTING_POSITION) - 1:
-                            settings.starting_position = STARTING_POSITION[index_of_current_starting_position + 1]
+                        if index_of_current_starting_position < len(STARTING_POSITIONS) - 1:
+                            settings.starting_position = STARTING_POSITIONS[index_of_current_starting_position + 1]
 
                     if buttons['back_button'].check_for_input(menu_mouse_pos):
                         self.back_to_main_menu()

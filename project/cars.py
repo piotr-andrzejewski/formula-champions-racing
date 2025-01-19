@@ -12,18 +12,20 @@ from utils import blit_rotate_center
 
 # constants
 TRACK_POSITIONS = {
-    'TRACK_1_P1': (380.0, 772),
-    'TRACK_1_P2': (400.0, 758.5),
-    'TRACK_1_P3': (420.0, 772),
-    'TRACK_1_P4': (440.0, 758.5),
-    'TRACK_1_P5': (460.0, 772),
-    'TRACK_1_P6': (480.0, 758.5),
-    'TRACK_1_P7': (500.0, 772),
-    'TRACK_1_P8': (520.0, 758.5),
-    'TRACK_1_RESET_POSITION': (528.5, 758.5)
+    'TRACK_1_1': (380.0, 772),
+    'TRACK_1_2': (400.0, 758.5),
+    'TRACK_1_3': (420.0, 772),
+    'TRACK_1_4': (440.0, 758.5),
+    'TRACK_1_5': (460.0, 772),
+    'TRACK_1_6': (480.0, 758.5),
+    'TRACK_1_7': (500.0, 772),
+    'TRACK_1_8': (520.0, 758.5),
 }
-TRACK_PATHS = {
-    'TRACK_1_PATH': [
+RESET_POSITIONS = {
+    'TRACK_1': (528.5, 758.5)
+}
+PATHS = {
+    'TRACK_1': [
         (234.0, 774.0), (71.0, 773.0), (26.0, 744.0), (96.0, 686.0), (200.0, 670.0),
         (332.0, 668.0), (377.0, 642.0), (363.0, 598.0), (286.0, 557.0), (241.0, 405.0),
         (211.0, 250.0), (169.0, 168.0), (74.0, 98.0), (105.0, 30.0), (182.0, 16.0), (290.0, 32.0),
@@ -38,7 +40,7 @@ PATH_POINT_MARGIN = 20.0
 
 class BaseCar:
     IMG = CAR_1
-    START_POS = TRACK_POSITIONS['TRACK_1_P1']
+    START_POS = TRACK_POSITIONS['TRACK_1_1']
     MAX_VEL = 3.0
 
     def __init__(self) -> None:
@@ -139,7 +141,7 @@ class PlayerCar(BaseCar):
         self.move()
 
     def reset_position(self) -> None:
-        self.x_pos, self.y_pos = TRACK_POSITIONS['TRACK_1_RESET_POSITION']
+        self.x_pos, self.y_pos = RESET_POSITIONS['TRACK_1']
         self.angle = 90.0
         self.vel = 0.0
 
@@ -163,11 +165,11 @@ class ComputerCar(BaseCar):
             self,
             img: Surface = BaseCar.IMG,
             level: int = LEVEL,
-            start_pos: tuple[float, float] = TRACK_POSITIONS['TRACK_1_P2']
+            start_pos: tuple[float, float] = TRACK_POSITIONS['TRACK_1_2']
     ) -> None:
         super().__init__()
 
-        self.path = TRACK_PATHS['TRACK_1_PATH']
+        self.path = PATHS['TRACK_1']
         self.current_point = 0
         self.vel = (self.MAX_VEL - 0.7 + level / 5) * calculate_vel_factor(img)
         self.img = pygame.transform.rotate(img, -90)
