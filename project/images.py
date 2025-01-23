@@ -28,11 +28,13 @@ FLAG_PENALTY = pygame.image.load('./assets/flag_penalty.png')
 
 CUP = pygame.image.load('./assets/cup.png')
 
-LIGHTS_ON_1 = pygame.image.load('./assets/lights_on_1.png')
-LIGHTS_ON_2 = pygame.image.load('./assets/lights_on_2.png')
-LIGHTS_ON_3 = pygame.image.load('./assets/lights_on_3.png')
-LIGHTS_ON_4 = pygame.image.load('./assets/lights_on_4.png')
-LIGHTS_ON_5 = pygame.image.load('./assets/lights_on_5.png')
-LIGHTS_OUT = pygame.image.load('./assets/lights_out.png')
+LIGHTS = {
+    0: pygame.image.load('./assets/lights_out.png'),
+    1: pygame.image.load('./assets/lights_on_1.png'),
+    2: pygame.image.load('./assets/lights_on_2.png'),
+    3: pygame.image.load('./assets/lights_on_3.png'),
+    4: pygame.image.load('./assets/lights_on_4.png'),
+    5: pygame.image.load('./assets/lights_on_5.png')
+}
 
 FINISH_LINE = scale_image(pygame.image.load('assets/finish_line.png'), 1.2)

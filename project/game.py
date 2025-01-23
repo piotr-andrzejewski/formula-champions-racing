@@ -1,11 +1,16 @@
 # main game
+
 import sys
 
 import time
 
+import pygame.time
+from pygame.display import get_surface
+
 from cars import *
-from images import FINISH_LINE, TRACK_1_LIMITS
+from images import FINISH_LINE, TRACK_1_LIMITS, LIGHTS
 from settings import *
+from utils import blit_screen
 
 mili = 1000
 
@@ -23,7 +28,7 @@ GAME_FONT.render('START', True, (255, 255, 255), (0, 0, 0))
 FPS = 60
 CLOCK = pygame.time.Clock()
 
-GAME_IMAGES = [
+TRACK_1_IMAGES = [
     (TRACK_1_LIMITS, TRACK_1_LIMITS_POSITION),
     (TRACK_1, TRACK_1_POSITION),
     (FINISH_LINE, TRACK_1_FINISH_LINE_POSITION)
@@ -48,11 +53,6 @@ class Game:
         self.game_start_time = 0.0
         self.game_total_time = 0.0
         self.player.reset()
-        self.player.score = 0
-        self.player.final_position = 1
-        self.player.lap_start_time = 0.0
-        self.player.lap_times = []
-        self.player.best_lap = None
         self.settings.occupied_starting_positions = []
 
         for opponent in self.opponents:
@@ -78,8 +78,21 @@ class Game:
 
         return opponents
 
+    def count_to_start_race(self, lights: dict[int, Surface] = LIGHTS) -> None:
+        for i in range(len(lights)):
+            self.game_window.blit(lights[i],(400, 400))
+            pygame.display.update()
+            time.sleep(1)
+
+        self.game_window.blit(lights[0], (400, 400))
+        pygame.display.update()
+        blit_screen(self.game_window)
+
     def start_game(self) -> None:
-        self.game_window.fill((0, 50, 0))
+        self.game_window.fill((0, 70, 0))
+        self.draw()
+        self.count_to_start_race(LIGHTS)
+        self.game_window.fill((0, 70, 0))
         self.started = True
         self.game_start_time = time.time_ns() / mili
 
@@ -136,9 +149,19 @@ class Game:
 
             pygame.display.update()
 
-    def draw(self) -> None:
-        for img, pos in GAME_IMAGES:
-            self.game_window.blit(img, pos)
+    def draw(self, track_name: str = "TRACK 1") -> None:
+        if self.player.crossed_line:
+            self.game_window.fill((0, 70, 0))
+
+        if track_name == "TRACK 1":
+            for img, pos in TRACK_1_IMAGES:
+                self.game_window.blit(img, pos)
+        # elif track_name == "TRACK 2":
+        #     for img, pos in TRACK_2_IMAGES:
+        #         self.game_window.blit(img, pos)
+        # elif track_name == "TRACK 3":
+        #     for img, pos in TRACK_3_IMAGES:
+        #         self.game_window.blit(img, pos)
 
         self.player.draw(self.game_window)
 

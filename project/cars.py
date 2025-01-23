@@ -132,6 +132,14 @@ class PlayerCar(BaseCar):
             self.lap_times = []
 
 
+    def reset(self) -> None:
+        self.score = 0
+        self.final_position = 1
+        self.lap_start_time = 0.0
+        self.lap_times = []
+        self.best_lap = None
+        super().reset()
+
     def brake(self) -> None:
         self.vel = max(self.vel - self.acceleration, 0)
         self.move()

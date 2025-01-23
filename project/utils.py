@@ -30,7 +30,7 @@ def get_font(size: int) -> pygame.font.Font:
     return pygame.font.Font('./assets/Space_Bd_BT_Bold.ttf', size)
 
 
-def blit_screen(window: Surface):
+def blit_screen(window: Surface) -> None:
     window.blit(Surface((window.get_width(), window.get_height())), (0, 0))
     pygame.display.update()
 
