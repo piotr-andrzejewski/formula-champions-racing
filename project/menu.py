@@ -7,19 +7,14 @@ import random
 from pygame import Surface
 
 from game import Game
-from settings import Settings, CARS, TRACKS, LAPS, OPPONENTS, OPPONENTS_LEVEL, STARTING_POSITIONS, CAR_NAMES, TRACK_NAMES
-from utils import Button, blit_screen, get_font
-
-
-# constants
-TITLE_FONT_SIZE = 100
-MAIN_FONT_SIZE = 75
-SECONDARY_FONT_SIZE = 50
-SELECTION_FONT_SIZE = 25
-
+from settings import CARS, TRACKS, LAPS, OPPONENTS, OPPONENTS_LEVEL, STARTING_POSITIONS, CAR_NAMES, TRACK_NAMES, \
+    Settings
+from utils import MAIN_FONT_SIZE, SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, TITLE_FONT_SIZE, \
+    blit_screen, create_text, get_font, Button
 
 # instantiate Settings class
 settings = Settings()
+from leaderboard import *
 
 
 def create_main_menu_buttons() -> dict[str, Button]:
@@ -202,7 +197,7 @@ class Menu:
             pygame.display.update()
 
     def create_main_menu_texts(self) -> None:
-        self.create_text(TITLE_FONT_SIZE, 'MAIN MENU', '#b68f40', (400, 200))
+        create_text(self.game_window, TITLE_FONT_SIZE, 'MAIN MENU', '#b68f40', (400, 200))
 
     def run_game(self) -> None:
         self.play_game = True
@@ -340,38 +335,18 @@ class Menu:
         self.main_menu()
 
     def create_settings_texts(self) -> None:
-        self.create_text(TITLE_FONT_SIZE, 'SETTINGS', '#b68f40', (400, 100))
-        self.create_text(SELECTION_FONT_SIZE, 'NAME', position=(450, 250), positioning='midright')
-        self.create_text(SELECTION_FONT_SIZE, settings.player_nickname, position=(600, 250))
-        self.create_text(SELECTION_FONT_SIZE, 'CAR', position=(450, 300), positioning='midright')
-        self.create_text(SELECTION_FONT_SIZE, settings.selected_car_name, position=(600, 300))
-        self.create_text(SELECTION_FONT_SIZE, 'TRACK', position=(450, 350), positioning='midright')
-        self.create_text(SELECTION_FONT_SIZE, settings.selected_track_name, position=(600, 350))
-        self.create_text(SELECTION_FONT_SIZE, 'LAPS', position=(450, 400), positioning='midright')
-        self.create_text(SELECTION_FONT_SIZE, str(settings.selected_laps), position=(600, 400))
-        self.create_text(SELECTION_FONT_SIZE, 'OPPONENTS', position=(450, 450), positioning='midright')
-        self.create_text(SELECTION_FONT_SIZE, str(settings.opponents), position=(600, 450))
-        self.create_text(SELECTION_FONT_SIZE, 'OPPONENTS LEVEL', position=(450, 500), positioning='midright')
-        self.create_text(SELECTION_FONT_SIZE, str(settings.opponents_level), position=(600, 500))
-        self.create_text(SELECTION_FONT_SIZE, 'STARTING POSITION', position=(450, 550), positioning='midright')
-        self.create_text(SELECTION_FONT_SIZE, str(settings.selected_starting_position), position=(600, 550))
-
-    # create text positioned by its center
-    def create_text(
-            self,
-            font_size: int = MAIN_FONT_SIZE,
-            text: str = 'SAMPLE TEXT',
-            color: str = '#d7fcd4',
-            position: tuple[int, int] = (400, 400),
-            positioning: str = 'center'
-    ) -> None:
-        text = get_font(font_size).render(text, True, color)
-
-        if positioning == 'midleft':
-            text_rect = text.get_rect(midleft=position)
-        elif positioning == 'midright':
-            text_rect = text.get_rect(midright=position)
-        else:
-            text_rect = text.get_rect(center=position)
-
-        self.game_window.blit(text, text_rect)
+        create_text(self.game_window, TITLE_FONT_SIZE, 'SETTINGS', '#b68f40', (400, 100))
+        create_text(self.game_window, SELECTION_FONT_SIZE, 'NAME', position=(450, 250), positioning='midright')
+        create_text(self.game_window, SELECTION_FONT_SIZE, settings.player_nickname, position=(600, 250))
+        create_text(self.game_window, SELECTION_FONT_SIZE, 'CAR', position=(450, 300), positioning='midright')
+        create_text(self.game_window, SELECTION_FONT_SIZE, settings.selected_car_name, position=(600, 300))
+        create_text(self.game_window, SELECTION_FONT_SIZE, 'TRACK', position=(450, 350), positioning='midright')
+        create_text(self.game_window, SELECTION_FONT_SIZE, settings.selected_track_name, position=(600, 350))
+        create_text(self.game_window, SELECTION_FONT_SIZE, 'LAPS', position=(450, 400), positioning='midright')
+        create_text(self.game_window, SELECTION_FONT_SIZE, str(settings.selected_laps), position=(600, 400))
+        create_text(self.game_window, SELECTION_FONT_SIZE, 'OPPONENTS', position=(450, 450), positioning='midright')
+        create_text(self.game_window, SELECTION_FONT_SIZE, str(settings.opponents), position=(600, 450))
+        create_text(self.game_window, SELECTION_FONT_SIZE, 'OPPONENTS LEVEL', position=(450, 500), positioning='midright')
+        create_text(self.game_window, SELECTION_FONT_SIZE, str(settings.opponents_level), position=(600, 500))
+        create_text(self.game_window, SELECTION_FONT_SIZE, 'STARTING POSITION', position=(450, 550), positioning='midright')
+        create_text(self.game_window, SELECTION_FONT_SIZE, str(settings.selected_starting_position), position=(600, 550))

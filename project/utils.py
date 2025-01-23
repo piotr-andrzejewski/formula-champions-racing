@@ -6,6 +6,12 @@ from pygame import Surface
 
 pygame.font.init()
 
+# constants
+TITLE_FONT_SIZE = 100
+MAIN_FONT_SIZE = 75
+SECONDARY_FONT_SIZE = 50
+SELECTION_FONT_SIZE = 25
+
 
 def scale_image(img: Surface, factor: float = 1) -> Surface:
     new_size = round(img.get_width() * factor), round(img.get_height() * factor)
@@ -41,6 +47,27 @@ def create_game_screen(width: int, height: int) -> Surface:
     pygame.display.set_icon(pygame.image.load('./assets/cup.png'))
 
     return game_screen
+
+
+# create text positioned by its center, midleft or midright
+def create_text(
+        game_window: Surface,
+        font_size: int = MAIN_FONT_SIZE,
+        text: str = 'SAMPLE TEXT',
+        color: str = '#d7fcd4',
+        position: tuple[int, int] = (400, 400),
+        positioning: str = 'center'
+) -> None:
+    text = get_font(font_size).render(text, True, color)
+
+    if positioning == 'midleft':
+        text_rect = text.get_rect(midleft=position)
+    elif positioning == 'midright':
+        text_rect = text.get_rect(midright=position)
+    else:
+        text_rect = text.get_rect(center=position)
+
+    game_window.blit(text, text_rect)
 
 
 class Button:

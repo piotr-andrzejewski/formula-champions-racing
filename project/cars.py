@@ -131,7 +131,6 @@ class PlayerCar(BaseCar):
         if self.lap_times is None:
             self.lap_times = []
 
-
     def reset(self) -> None:
         self.score = 0
         self.final_position = 1
