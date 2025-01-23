@@ -1,4 +1,5 @@
 # game settings
+
 import random
 
 from pygame import Surface

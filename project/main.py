@@ -1,3 +1,5 @@
+# main loop for starting the game in main menu
+
 from menu import Menu
 from utils import create_game_screen
 

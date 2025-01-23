@@ -1,7 +1,6 @@
 # main game
 
 import sys
-
 import time
 
 import pygame.time
