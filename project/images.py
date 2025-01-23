@@ -23,7 +23,7 @@ CAR_6 = pygame.image.load('./assets/car6.png')
 CAR_7 = pygame.image.load('./assets/car7.png')
 CAR_8 = pygame.image.load('./assets/car8.png')
 
-FLAG_FINISH = pygame.image.load('./assets/flag_finish.png')
+FLAG_FINISH = scale_image(pygame.image.load('./assets/flag_finish.png'), 0.8)
 FLAG_PENALTY = pygame.image.load('./assets/flag_penalty.png')
 
 CUP = pygame.image.load('./assets/cup.png')

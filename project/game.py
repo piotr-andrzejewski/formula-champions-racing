@@ -7,9 +7,9 @@ import pygame.time
 from pygame.display import get_surface
 
 from cars import *
-from images import FINISH_LINE, TRACK_1_LIMITS, LIGHTS
+from images import FINISH_LINE, TRACK_1_LIMITS, LIGHTS, FLAG_FINISH
 from settings import *
-from utils import blit_screen
+from utils import SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, blit_screen, create_text, get_font, Button
 
 mili = 1000
 
@@ -79,6 +79,11 @@ class Game:
 
     def count_to_start_race(self, lights: dict[int, Surface] = LIGHTS) -> None:
         for i in range(len(lights)):
+            self.check_events()
+
+            if not self.started:
+                return
+
             self.game_window.blit(lights[i],(400, 400))
             pygame.display.update()
             time.sleep(1)
@@ -90,14 +95,12 @@ class Game:
     def start_game(self) -> None:
         self.game_window.fill((0, 70, 0))
         self.draw()
-        self.count_to_start_race(LIGHTS)
-        self.game_window.fill((0, 70, 0))
         self.started = True
-        self.game_start_time = time.time_ns() / mili
 
     def end_game(self) -> None:
         self.get_best_lap()
         self.get_game_total_time()
+        # self.show_results()
         print('Laps completed:')
         print('Player: ', self.player.completed_laps)
 
@@ -115,7 +118,6 @@ class Game:
 
     def run(self) -> None:
         self.start_game()
-
         # main loop for the game
         while self.started:
 
@@ -123,19 +125,11 @@ class Game:
             CLOCK.tick(FPS)
             # mouse_pos = pygame.mouse.get_pos()
 
-            for event in pygame.event.get():
-
-                # check the event of user clicking 'X' button to close the game window
-                if event.type == pygame.QUIT:
-                    self.end_game()
-                    sys.exit()
-
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    self.end_game()
-
-                # if event.type == pygame.MOUSEBUTTONDOWN:
-                #     print(mouse_pos)
-
+            self.check_events()
+            # self.count_to_start_race(LIGHTS)
+            self.game_start_time = time.time_ns() / mili
+            self.game_window.fill((0, 70, 0))
+            self.show_results()
             self.draw()
             self.move_player()
             # generate_path_for_computer_car()
@@ -147,6 +141,24 @@ class Game:
                 self.end_game()
 
             pygame.display.update()
+
+    def check_events(self, buttons: dict[str, Button] = None, mouse_pos: tuple[int, int] = (0, 0)) -> None:
+        for event in pygame.event.get():
+
+            # check the event of user clicking 'X' button to close the game window
+            if event.type == pygame.QUIT:
+                self.end_game()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                self.end_game()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+            #     print(mouse_pos)
+
+                if buttons:
+                    if buttons['back'].check_for_input(mouse_pos):
+                        self.end_game()
 
     def draw(self, track_name: str = "TRACK 1") -> None:
         if self.player.crossed_line:
@@ -277,3 +289,100 @@ class Game:
 
         if self.player.best_lap is not None:
             print(f'Best lap: {self.player.best_lap}')
+
+    def show_results(self) -> None:
+        box = pygame.Surface((400, 400), masks=(0, 0, 0))
+        self.game_window.blit(box, (200, 200))
+        pygame.display.update()
+
+        while self.started:
+            mouse_pos = pygame.mouse.get_pos()
+            self.create_results_texts()
+            self.game_window.blit(FLAG_FINISH, (470, 225))
+
+            back_button = self.create_back_button()
+            back_button.change_color(mouse_pos)
+            back_button.update(self.game_window)
+
+            self.check_events(buttons={'back': back_button}, mouse_pos=mouse_pos)
+
+            pygame.display.update()
+
+    def create_results_texts(self) -> None:
+        left_pos, right_pos = 225, 575
+        top_pos = 335
+        interval = 50
+        create_text(
+            self.game_window,
+            SECONDARY_FONT_SIZE,
+            'RESULTS',
+            color='#b68f40',
+            position=(left_pos, 260),
+            positioning='midleft'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            'POSITION',
+            position=(left_pos, top_pos),
+            positioning='midleft'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(self.player.final_position) + ' / ' + str(self.settings.opponents + 1),
+            position=(right_pos, top_pos),
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            'COMPLETED LAPS',
+            position=(left_pos, top_pos + interval),
+            positioning='midleft'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(self.player.completed_laps) + ' / ' + str(self.settings.selected_laps),
+            position=(right_pos, top_pos + interval),
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            'BEST LAP',
+            position=(left_pos, top_pos + 2 * interval),
+            positioning='midleft'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(self.player.best_lap),
+            position=(right_pos, top_pos + 2 * interval),
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            "SCORE",
+            position=(left_pos, top_pos + 3 * interval),
+            positioning='midleft'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(self.player.score),
+            position=(right_pos, top_pos + 3 * interval),
+            positioning='midright'
+        )
+
+    @staticmethod
+    def create_back_button() -> Button:
+        return Button(
+            position=(400, 550),
+            text_input='BACK',
+            font=get_font(SELECTION_FONT_SIZE),
+            base_color='#d7fcd4',
+            hover_color='white'
+        )
