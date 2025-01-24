@@ -4,6 +4,7 @@ import sys
 import time
 
 import pygame.time
+from pygame import KEYDOWN
 from pygame.display import get_surface
 
 from cars import *
@@ -78,12 +79,11 @@ class Game:
         return opponents
 
     def count_to_start_race(self, lights: dict[int, Surface] = LIGHTS) -> None:
+        self.game_window.fill((0, 70, 0))
+        self.draw()
+
         for i in range(len(lights)):
             self.check_events()
-
-            if not self.started:
-                return
-
             self.game_window.blit(lights[i],(400, 400))
             pygame.display.update()
             time.sleep(1)
@@ -91,24 +91,44 @@ class Game:
         self.game_window.blit(lights[0], (400, 400))
         pygame.display.update()
         blit_screen(self.game_window)
+        self.game_window.fill((0, 70, 0))
+
+        self.started = True
 
     def start_game(self) -> None:
         self.game_window.fill((0, 70, 0))
         self.draw()
-        self.started = True
+        create_text(
+            self.game_window,
+            SECONDARY_FONT_SIZE,
+            "PRESS SPACE KEY TO START",
+            color='#b68f40',
+            position=(400, 400)
+        )
+        pygame.display.update()
+        started = False
+
+        while not started:
+            self.check_events()
+
+            for event in pygame.event.get():
+                if event.type == KEYDOWN and event.key == pygame.K_ESCAPE:
+                    return
+
+                if event.type == KEYDOWN and event.key == pygame.K_SPACE:
+                    started = True
+
+        self.count_to_start_race()
 
     def end_game(self) -> None:
-        self.get_best_lap()
-        self.get_game_total_time()
-        # self.show_results()
-        print('Laps completed:')
-        print('Player: ', self.player.completed_laps)
-
-        for i in range(len(self.opponents)):
-            print(f'Opponent {i + 1}: ', self.opponents[i].completed_laps)
-
-            # # code to display computer car's path in console to be able to copy it for PATH variable
-            # print(opponents[i].path)
+        # print('Laps completed:')
+        # print('Player: ', self.player.completed_laps)
+        #
+        # for i in range(len(self.opponents)):
+        #     print(f'Opponent {i + 1}: ', self.opponents[i].completed_laps)
+        #
+        #     # # code to display computer car's path in console to be able to copy it for PATH variable
+        #     # print(opponents[i].path)
 
         self.reset()
 
@@ -118,6 +138,7 @@ class Game:
 
     def run(self) -> None:
         self.start_game()
+
         # main loop for the game
         while self.started:
 
@@ -125,11 +146,9 @@ class Game:
             CLOCK.tick(FPS)
             # mouse_pos = pygame.mouse.get_pos()
 
-            self.check_events()
-            # self.count_to_start_race(LIGHTS)
             self.game_start_time = time.time_ns() / mili
-            self.game_window.fill((0, 70, 0))
-            self.show_results()
+
+            self.check_events()
             self.draw()
             self.move_player()
             # generate_path_for_computer_car()
@@ -138,7 +157,7 @@ class Game:
             self.handle_finish_line_crossing()
 
             if self.player.completed_laps == self.settings.selected_laps:
-                self.end_game()
+                self.show_results()
 
             pygame.display.update()
 
@@ -152,6 +171,9 @@ class Game:
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.end_game()
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.started = True
 
             if event.type == pygame.MOUSEBUTTONDOWN:
             #     print(mouse_pos)
@@ -294,6 +316,9 @@ class Game:
         box = pygame.Surface((400, 400), masks=(0, 0, 0))
         self.game_window.blit(box, (200, 200))
         pygame.display.update()
+
+        self.get_best_lap()
+        self.get_game_total_time()
 
         while self.started:
             mouse_pos = pygame.mouse.get_pos()
