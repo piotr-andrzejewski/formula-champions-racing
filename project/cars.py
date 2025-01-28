@@ -124,7 +124,7 @@ class PlayerCar(BaseCar):
         self.max_vel *= calculate_vel_factor(self.img)
         self.score = 0
         self.final_position = 1
-        self.lap_start_time = 0.0
+        self.lap_start_time = 0
         self.lap_times = None
         self.best_lap = None
 
@@ -134,7 +134,7 @@ class PlayerCar(BaseCar):
     def reset(self) -> None:
         self.score = 0
         self.final_position = 1
-        self.lap_start_time = 0.0
+        self.lap_start_time = 0
         self.lap_times = []
         self.best_lap = None
         super().reset()

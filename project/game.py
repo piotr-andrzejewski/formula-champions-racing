@@ -12,8 +12,6 @@ from images import FINISH_LINE, TRACK_1_LIMITS, LIGHTS, FLAG_FINISH
 from settings import *
 from utils import SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, blit_screen, create_text, get_font, Button
 
-mili = 1000
-
 # constants for the game
 TRACK_1_POSITION = (10, 10)
 TRACK_1_LIMITS_POSITION = (10, 10)
@@ -45,13 +43,13 @@ class Game:
         self.player = self.generate_player()
         self.opponents = self.generate_opponents()
         self.started = False
-        self.game_start_time = 0.0
-        self.game_total_time = 0.0
+        self.game_start_time = 0
+        self.game_total_time = 0
 
     def reset(self) -> None:
         self.started = False
-        self.game_start_time = 0.0
-        self.game_total_time = 0.0
+        self.game_start_time = 0
+        self.game_total_time = 0
         self.player.reset()
         self.settings.occupied_starting_positions = []
 
@@ -119,6 +117,7 @@ class Game:
                     started = True
 
         self.count_to_start_race()
+        self.game_start_time = CLOCK.get_time()
 
     def end_game(self) -> None:
         # print('Laps completed:')
@@ -133,7 +132,7 @@ class Game:
         self.reset()
 
     def get_game_total_time(self) -> None:
-        self.game_total_time = round(time.time_ns() / mili - self.game_start_time)
+        self.game_total_time = CLOCK.get_time() - self.game_start_time
         print(f'Total time: {self.game_total_time}')
 
     def run(self) -> None:
@@ -141,12 +140,10 @@ class Game:
 
         # main loop for the game
         while self.started:
+            # mouse_pos = pygame.mouse.get_pos()
 
             # set max fps for the game
             CLOCK.tick(FPS)
-            # mouse_pos = pygame.mouse.get_pos()
-
-            self.game_start_time = time.time_ns() / mili
 
             self.check_events()
             self.draw()
@@ -268,9 +265,9 @@ class Game:
 
         if player_finish_line_poi is None:
             if self.player.crossed_line:
-                current_time = time.time_ns() / mili
+                current_time = CLOCK.get_time()
                 self.player.completed_laps += 1
-                self.player.lap_times.append(round(current_time - self.player.lap_start_time))
+                self.player.lap_times.append(current_time - self.player.lap_start_time)
                 self.player.lap_start_time = current_time
                 self.player.crossed_line = False
                 print('Lap completed')
@@ -313,7 +310,7 @@ class Game:
             print(f'Best lap: {self.player.best_lap}')
 
     def show_results(self) -> None:
-        box = pygame.Surface((400, 400), masks=(0, 0, 0))
+        box = pygame.Surface((400, 450), masks=(0, 0, 0))
         self.game_window.blit(box, (200, 200))
         pygame.display.update()
 
@@ -401,11 +398,25 @@ class Game:
             position=(right_pos, top_pos + 3 * interval),
             positioning='midright'
         )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            "TOTAL TIME",
+            position=(left_pos, top_pos + 4 * interval),
+            positioning='midleft'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(self.game_total_time),
+            position=(right_pos, top_pos + 4 * interval),
+            positioning='midright'
+        )
 
     @staticmethod
     def create_back_button() -> Button:
         return Button(
-            position=(400, 550),
+            position=(400, 600),
             text_input='BACK',
             font=get_font(SELECTION_FONT_SIZE),
             base_color='#d7fcd4',
