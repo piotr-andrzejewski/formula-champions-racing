@@ -123,6 +123,7 @@ class PlayerCar(BaseCar):
         self.x_pos, self.y_pos = start_pos
         self.max_vel *= calculate_vel_factor(self.img)
         self.score = 0
+        self.current_position = 1
         self.final_position = 1
         self.lap_start_time = 0
         self.lap_times = None
@@ -133,6 +134,7 @@ class PlayerCar(BaseCar):
 
     def reset(self) -> None:
         self.score = 0
+        self.current_position = 1
         self.final_position = 1
         self.lap_start_time = 0
         self.lap_times = []

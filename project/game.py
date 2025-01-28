@@ -148,6 +148,8 @@ class Game:
             self.check_events()
             self.draw()
             self.move_player()
+            self.display_info()
+
             # generate_path_for_computer_car()
 
             self.handle_collisions()
@@ -329,6 +331,40 @@ class Game:
             self.check_events(buttons={'back': back_button}, mouse_pos=mouse_pos)
 
             pygame.display.update()
+
+    def display_info(self) -> None:
+        left_pos = 650
+        right_pos = 725
+        top_pos = 100
+        interval = 50
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            'LAP:',
+            position=(left_pos, top_pos),
+            positioning='midleft'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(self.player.completed_laps + 1) + ' / ' + str(self.settings.selected_laps),
+            position=(right_pos, top_pos),
+            positioning='midleft'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            'POS:',
+            position=(left_pos, top_pos + interval),
+            positioning='midleft'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(self.player.current_position) + ' / ' + str(self.settings.opponents + 1),
+            position=(right_pos, top_pos + interval),
+            positioning='midleft'
+        )
 
     def create_results_texts(self) -> None:
         left_pos, right_pos = 225, 575
