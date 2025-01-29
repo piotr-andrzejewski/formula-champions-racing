@@ -11,6 +11,7 @@ TITLE_FONT_SIZE = 100
 MAIN_FONT_SIZE = 75
 SECONDARY_FONT_SIZE = 50
 SELECTION_FONT_SIZE = 25
+GAME_INFO_FONT_SIZE = 15
 
 
 def scale_image(img: Surface, factor: float = 1) -> Surface:

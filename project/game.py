@@ -10,7 +10,8 @@ from pygame.display import get_surface
 from cars import *
 from images import FINISH_LINE, TRACK_1_LIMITS, LIGHTS, FLAG_FINISH
 from settings import *
-from utils import SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, blit_screen, create_text, get_font, Button
+from utils import SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, blit_screen, create_text, get_font, Button, \
+    GAME_INFO_FONT_SIZE
 
 # constants for the game
 TRACK_1_POSITION = (10, 10)
@@ -116,7 +117,7 @@ class Game:
                 if event.type == KEYDOWN and event.key == pygame.K_SPACE:
                     started = True
 
-        self.count_to_start_race()
+        # self.count_to_start_race()
         self.game_start_time = CLOCK.get_time()
 
     def end_game(self) -> None:
@@ -131,9 +132,14 @@ class Game:
 
         self.reset()
 
-    def get_game_total_time(self) -> None:
-        self.game_total_time = CLOCK.get_time() - self.game_start_time
-        print(f'Total time: {self.game_total_time}')
+    def get_lap_time(self) -> int:
+        return CLOCK.get_time() - self.player.lap_start_time
+
+    def get_game_total_time(self) -> int:
+        current_time = CLOCK.get_time() - self.game_start_time
+        self.game_total_time = current_time
+
+        return current_time
 
     def run(self) -> None:
         self.start_game()
@@ -148,11 +154,10 @@ class Game:
             self.check_events()
             self.draw()
             self.move_player()
-            self.display_info()
 
             # generate_path_for_computer_car()
 
-            self.handle_collisions()
+            self.handle_out_of_track()
             self.handle_finish_line_crossing()
 
             if self.player.completed_laps == self.settings.selected_laps:
@@ -181,11 +186,23 @@ class Game:
                     if buttons['back'].check_for_input(mouse_pos):
                         self.end_game()
 
-    def draw(self, track_name: str = "TRACK 1") -> None:
-        if self.player.crossed_line:
-            self.game_window.fill((0, 70, 0))
+    def draw(self, track_name: str = 'TRACK 1') -> None:
+        self.game_window.fill((0, 70, 0))
+        self.draw_track(track_name)
+        self.display_info()
 
-        if track_name == "TRACK 1":
+        if self.player.out_of_track:
+            self.display_back_to_track_text()
+
+        self.player.draw(self.game_window)
+
+        for opponent in self.opponents:
+            opponent.draw(self.game_window)
+
+        pygame.display.update()
+
+    def draw_track(self, track_name: str = 'TRACK 1') -> None:
+        if track_name == 'TRACK 1':
             for img, pos in TRACK_1_IMAGES:
                 self.game_window.blit(img, pos)
         # elif track_name == "TRACK 2":
@@ -194,13 +211,6 @@ class Game:
         # elif track_name == "TRACK 3":
         #     for img, pos in TRACK_3_IMAGES:
         #         self.game_window.blit(img, pos)
-
-        self.player.draw(self.game_window)
-
-        for opponent in self.opponents:
-            opponent.draw(self.game_window)
-
-        pygame.display.update()
 
     def move_player(self) -> None:
         keys = pygame.key.get_pressed()
@@ -236,11 +246,13 @@ class Game:
                 elif keys[pygame.K_d]:
                     self.player.rotate(right=True)
 
-    def handle_collisions(self) -> None:
+    def handle_out_of_track(self) -> None:
 
         # TODO: handle track limits for potential penalties when player turns on such option
         if self.player.collide(TRACK_1_LIMITS_MASK, *TRACK_1_LIMITS_POSITION) is None:
-            print('Get back to track')
+            self.player.out_of_track = True
+        else:
+            self.player.out_of_track = False
 
     def handle_finish_line_crossing(self) -> None:
         for opponent in self.opponents:
@@ -305,11 +317,11 @@ class Game:
             if pressed_keys[pygame.K_SPACE]:
                 self.opponents[i].path.append((self.player.x_pos, self.player.y_pos))
 
-    def get_best_lap(self) -> None:
+    def get_best_lap(self) -> int | None:
         self.player.find_best_lap()
 
         if self.player.best_lap is not None:
-            print(f'Best lap: {self.player.best_lap}')
+            return self.player.best_lap
 
     def show_results(self) -> None:
         box = pygame.Surface((400, 450), masks=(0, 0, 0))
@@ -333,37 +345,65 @@ class Game:
             pygame.display.update()
 
     def display_info(self) -> None:
-        left_pos = 650
-        right_pos = 725
+        left_pos = 725
+        right_pos = 775
         top_pos = 100
-        interval = 50
+        interval = 30
         create_text(
             self.game_window,
-            SELECTION_FONT_SIZE,
+            GAME_INFO_FONT_SIZE,
             'LAP:',
             position=(left_pos, top_pos),
-            positioning='midleft'
+            positioning='midright'
         )
         create_text(
             self.game_window,
-            SELECTION_FONT_SIZE,
+            GAME_INFO_FONT_SIZE,
             str(self.player.completed_laps + 1) + ' / ' + str(self.settings.selected_laps),
             position=(right_pos, top_pos),
-            positioning='midleft'
+            positioning='midright'
         )
         create_text(
             self.game_window,
-            SELECTION_FONT_SIZE,
-            'POS:',
+            GAME_INFO_FONT_SIZE,
+            'LAP TIME:',
             position=(left_pos, top_pos + interval),
-            positioning='midleft'
+            positioning='midright'
         )
         create_text(
             self.game_window,
-            SELECTION_FONT_SIZE,
-            str(self.player.current_position) + ' / ' + str(self.settings.opponents + 1),
+            GAME_INFO_FONT_SIZE,
+            str(self.get_lap_time()),
             position=(right_pos, top_pos + interval),
-            positioning='midleft'
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            GAME_INFO_FONT_SIZE,
+            'TOTAL TIME:',
+            position=(left_pos, top_pos + 2* interval),
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            GAME_INFO_FONT_SIZE,
+            str(self.get_game_total_time()),
+            position=(right_pos, top_pos + 2 * interval),
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            GAME_INFO_FONT_SIZE,
+            'VELOCITY:',
+            position=(left_pos, top_pos + 3 * interval),
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            GAME_INFO_FONT_SIZE,
+            str(round(self.player.vel, 2)),
+            position=(right_pos, top_pos + 3 * interval),
+            positioning='midright'
         )
 
     def create_results_texts(self) -> None:
@@ -457,4 +497,13 @@ class Game:
             font=get_font(SELECTION_FONT_SIZE),
             base_color='#d7fcd4',
             hover_color='white'
+        )
+
+    def display_back_to_track_text(self):
+        create_text(
+            self.game_window,
+            SECONDARY_FONT_SIZE,
+            'GET BACK TO TRACK',
+            color='#b68f40',
+            position=(400, 400)
         )
