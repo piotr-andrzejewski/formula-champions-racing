@@ -44,13 +44,13 @@ class Game:
         self.player = self.generate_player()
         self.opponents = self.generate_opponents()
         self.started = False
-        self.game_start_time = 0
-        self.game_total_time = 0
+        self.game_start_time = 0.0
+        self.game_total_time = 0.0
 
     def reset(self) -> None:
         self.started = False
-        self.game_start_time = 0
-        self.game_total_time = 0
+        self.game_start_time = 0.0
+        self.game_total_time = 0.0
         self.player.reset()
         self.settings.occupied_starting_positions = []
 
@@ -78,16 +78,18 @@ class Game:
         return opponents
 
     def count_to_start_race(self, lights: dict[int, Surface] = LIGHTS) -> None:
+        x_pos = 350
+        y_pos = 350
         self.game_window.fill((0, 70, 0))
         self.draw()
 
         for i in range(len(lights)):
             self.check_events()
-            self.game_window.blit(lights[i],(400, 400))
+            self.game_window.blit(lights[i],(x_pos, y_pos))
             pygame.display.update()
             time.sleep(1)
 
-        self.game_window.blit(lights[0], (400, 400))
+        self.game_window.blit(lights[0], (x_pos, y_pos))
         pygame.display.update()
         blit_screen(self.game_window)
         self.game_window.fill((0, 70, 0))
@@ -117,8 +119,10 @@ class Game:
                 if event.type == KEYDOWN and event.key == pygame.K_SPACE:
                     started = True
 
-        # self.count_to_start_race()
-        self.game_start_time = CLOCK.get_time()
+        self.count_to_start_race()
+        current_time = round(time.time(), 3)
+        self.game_start_time = current_time
+        self.player.lap_start_time = current_time
 
     def end_game(self) -> None:
         # print('Laps completed:')
@@ -133,10 +137,10 @@ class Game:
         self.reset()
 
     def get_lap_time(self) -> int:
-        return CLOCK.get_time() - self.player.lap_start_time
+        return round(time.time() - self.player.lap_start_time, 3)
 
-    def get_game_total_time(self) -> int:
-        current_time = CLOCK.get_time() - self.game_start_time
+    def get_game_total_time(self) -> float:
+        current_time = round(time.time() - self.game_start_time, 3)
         self.game_total_time = current_time
 
         return current_time
@@ -186,9 +190,9 @@ class Game:
                     if buttons['back'].check_for_input(mouse_pos):
                         self.end_game()
 
-    def draw(self, track_name: str = 'TRACK 1') -> None:
+    def draw(self) -> None:
         self.game_window.fill((0, 70, 0))
-        self.draw_track(track_name)
+        self.draw_track(self.settings.selected_track_name)
         self.display_info()
 
         if self.player.out_of_track:
@@ -274,17 +278,16 @@ class Game:
                 self.player.crossed_line = True
 
             if not self.player.crossed_line:
-                print('Wrong way')
+                self.display_wrong_way_text()
                 self.player.reset_position()
 
         if player_finish_line_poi is None:
             if self.player.crossed_line:
-                current_time = CLOCK.get_time()
+                current_time = round(time.time(), 3)
                 self.player.completed_laps += 1
-                self.player.lap_times.append(current_time - self.player.lap_start_time)
+                self.player.lap_times.append(round(current_time - self.player.lap_start_time, 3))
                 self.player.lap_start_time = current_time
                 self.player.crossed_line = False
-                print('Lap completed')
 
     def generate_path_for_computer_car(self) -> None:
         pressed_keys = pygame.key.get_pressed()
@@ -345,8 +348,8 @@ class Game:
             pygame.display.update()
 
     def display_info(self) -> None:
-        left_pos = 725
-        right_pos = 775
+        left_pos = 720
+        right_pos = 785
         top_pos = 100
         interval = 30
         create_text(
@@ -359,13 +362,6 @@ class Game:
         create_text(
             self.game_window,
             GAME_INFO_FONT_SIZE,
-            str(self.player.completed_laps + 1) + ' / ' + str(self.settings.selected_laps),
-            position=(right_pos, top_pos),
-            positioning='midright'
-        )
-        create_text(
-            self.game_window,
-            GAME_INFO_FONT_SIZE,
             'LAP TIME:',
             position=(left_pos, top_pos + interval),
             positioning='midright'
@@ -373,22 +369,8 @@ class Game:
         create_text(
             self.game_window,
             GAME_INFO_FONT_SIZE,
-            str(self.get_lap_time()),
-            position=(right_pos, top_pos + interval),
-            positioning='midright'
-        )
-        create_text(
-            self.game_window,
-            GAME_INFO_FONT_SIZE,
             'TOTAL TIME:',
-            position=(left_pos, top_pos + 2* interval),
-            positioning='midright'
-        )
-        create_text(
-            self.game_window,
-            GAME_INFO_FONT_SIZE,
-            str(self.get_game_total_time()),
-            position=(right_pos, top_pos + 2 * interval),
+            position=(left_pos, top_pos + 2 * interval),
             positioning='midright'
         )
         create_text(
@@ -404,6 +386,69 @@ class Game:
             str(round(self.player.vel, 2)),
             position=(right_pos, top_pos + 3 * interval),
             positioning='midright'
+        )
+
+        if self.started:
+            create_text(
+                self.game_window,
+                GAME_INFO_FONT_SIZE,
+                str(self.player.completed_laps + 1) + ' / ' + str(self.settings.selected_laps),
+                position=(right_pos, top_pos),
+                positioning='midright'
+            )
+            create_text(
+                self.game_window,
+                GAME_INFO_FONT_SIZE,
+                str(self.get_lap_time()),
+                position=(right_pos, top_pos + interval),
+                positioning='midright'
+            )
+            create_text(
+                self.game_window,
+                GAME_INFO_FONT_SIZE,
+                str(self.get_game_total_time()),
+                position=(right_pos, top_pos + 2 * interval),
+                positioning='midright'
+            )
+        else:
+            create_text(
+                self.game_window,
+                GAME_INFO_FONT_SIZE,
+                str(self.player.completed_laps) + ' / ' + str(self.settings.selected_laps),
+                position=(right_pos, top_pos),
+                positioning='midright'
+            )
+            create_text(
+                self.game_window,
+                GAME_INFO_FONT_SIZE,
+                str(self.player.lap_start_time),
+                position=(right_pos, top_pos + interval),
+                positioning='midright'
+            )
+            create_text(
+                self.game_window,
+                GAME_INFO_FONT_SIZE,
+                str(self.game_total_time),
+                position=(right_pos, top_pos + 2 * interval),
+                positioning='midright'
+            )
+
+    def display_back_to_track_text(self):
+        create_text(
+            self.game_window,
+            SECONDARY_FONT_SIZE,
+            'GET BACK TO TRACK',
+            color='#b68f40',
+            position=(400, 400)
+        )
+
+    def display_wrong_way_text(self):
+        create_text(
+            self.game_window,
+            SECONDARY_FONT_SIZE,
+            'WRONG WAY',
+            color='#b68f40',
+            position=(400, 400)
         )
 
     def create_results_texts(self) -> None:
@@ -463,28 +508,28 @@ class Game:
         create_text(
             self.game_window,
             SELECTION_FONT_SIZE,
-            "SCORE",
+            "TOTAL TIME",
             position=(left_pos, top_pos + 3 * interval),
             positioning='midleft'
         )
         create_text(
             self.game_window,
             SELECTION_FONT_SIZE,
-            str(self.player.score),
+            str(self.game_total_time),
             position=(right_pos, top_pos + 3 * interval),
             positioning='midright'
         )
         create_text(
             self.game_window,
             SELECTION_FONT_SIZE,
-            "TOTAL TIME",
+            "SCORE",
             position=(left_pos, top_pos + 4 * interval),
             positioning='midleft'
         )
         create_text(
             self.game_window,
             SELECTION_FONT_SIZE,
-            str(self.game_total_time),
+            str(self.player.score),
             position=(right_pos, top_pos + 4 * interval),
             positioning='midright'
         )
@@ -497,13 +542,4 @@ class Game:
             font=get_font(SELECTION_FONT_SIZE),
             base_color='#d7fcd4',
             hover_color='white'
-        )
-
-    def display_back_to_track_text(self):
-        create_text(
-            self.game_window,
-            SECONDARY_FONT_SIZE,
-            'GET BACK TO TRACK',
-            color='#b68f40',
-            position=(400, 400)
         )
