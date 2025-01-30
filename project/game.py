@@ -171,7 +171,10 @@ class Game:
                 self.determine_penalty(self.time_out_of_track)
                 if self.penalty:
                     self.display_penalty_text(self.penalty)
-                    self.player.score -= 1
+                    self.player.score -= 50
+
+            if self.player.score < 0:
+                self.player.score = 0
 
             pygame.display.update()
 
@@ -338,6 +341,76 @@ class Game:
         if self.player.best_lap is not None:
             return self.player.best_lap
 
+    def calculate_score(self) -> None:
+        if self.settings.selected_track_name == 'TRACK 3':
+            track_factor = 0.9
+        elif self.settings.selected_track_name == 'TRACK 2':
+            track_factor = 0.8
+        else:
+            track_factor = 1
+
+        if self.settings.opponents_level == 1:
+            opponents_level_factor = 0.6
+        elif self.settings.opponents_level == 2:
+            opponents_level_factor = 0.8
+        else:
+            opponents_level_factor = 1
+
+        if self.settings.selected_starting_position < 5:
+            starting_position_factor = 0.8
+        else:
+            starting_position_factor = 1
+
+        if self.player.final_position == 1:
+            final_position_factor = 1
+        elif self.player.final_position == 2:
+            final_position_factor = 0.9
+        elif self.player.final_position == 3:
+            final_position_factor = 0.8
+        elif self.player.final_position == 4:
+            final_position_factor = 0.7
+        elif self.player.final_position == 5:
+            final_position_factor = 0.6
+        elif self.player.final_position == 6:
+            final_position_factor = 0.5
+        elif self.player.final_position == 7:
+            final_position_factor = 0.4
+        else:
+            final_position_factor = 0.3
+
+        total_time_factor = 0.5
+
+        for i in range(1, len(LAPS)):
+            if self.settings.selected_laps == i:
+                if self.game_total_time <= 35.0 * i:
+                    total_time_factor = 1
+                elif self.game_total_time <= 50.0 * i:
+                    total_time_factor = 0.75
+                else:
+                    total_time_factor = 0.5
+                break
+
+        if self.settings.penalties == 'ON':
+            penalties_factor = 1
+        else:
+            penalties_factor = 0.5
+
+        car_factor = calculate_vel_factor(self.player.img)
+
+        self.player.score = round(
+                1000
+                * 60
+                * track_factor
+                * opponents_level_factor
+                * starting_position_factor
+                * final_position_factor
+                * total_time_factor
+                * penalties_factor
+                * self.settings.selected_laps
+                / car_factor
+                / self.game_total_time
+        )
+
     def show_results(self) -> None:
         box = pygame.Surface((400, 450), masks=(0, 0, 0))
         self.game_window.blit(box, (200, 200))
@@ -345,6 +418,7 @@ class Game:
 
         self.get_best_lap()
         self.get_game_total_time()
+        self.calculate_score()
 
         while self.started:
             mouse_pos = pygame.mouse.get_pos()

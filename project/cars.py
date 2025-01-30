@@ -173,7 +173,7 @@ class PlayerCar(BaseCar):
         self.best_lap = (1, self.lap_times[0])
 
         for i in range(lap_times_length - 1):
-            if self.lap_times[i + 1] > self.lap_times[i]:
+            if self.lap_times[i + 1] < self.lap_times[i]:
                 self.best_lap = (i + 2, self.lap_times[i + 1])
 
 
