@@ -8,7 +8,7 @@ from pygame import Surface
 
 from game import Game
 from settings import CARS, TRACKS, LAPS, OPPONENTS, OPPONENTS_LEVEL, STARTING_POSITIONS, CAR_NAMES, TRACK_NAMES, \
-    Settings
+    PENALTIES, Settings
 from utils import MAIN_FONT_SIZE, SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, TITLE_FONT_SIZE, \
     blit_screen, create_text, get_font, Button
 
@@ -186,6 +186,18 @@ class Menu:
                             settings.starting_position = STARTING_POSITIONS[index_of_current_starting_position + 1]
                             settings.selected_starting_position = STARTING_POSITIONS[index_of_current_starting_position + 1]
 
+                    if buttons['select_penalties_previous'].check_for_input(mouse_pos):
+                        index_of_current_penalties = PENALTIES.index(settings.penalties)
+
+                        if index_of_current_penalties > 0:
+                            settings.penalties = PENALTIES[index_of_current_penalties - 1]
+
+                    if buttons['select_penalties_next'].check_for_input(mouse_pos):
+                        index_of_current_penalties = PENALTIES.index(settings.penalties)
+
+                        if index_of_current_penalties < len(PENALTIES) - 1:
+                            settings.penalties = PENALTIES[index_of_current_penalties + 1]
+
                     if buttons['back'].check_for_input(mouse_pos):
                         self.back_to_main_menu()
 
@@ -198,21 +210,122 @@ class Menu:
         self.main_menu()
 
     def create_settings_texts(self) -> None:
-        create_text(self.game_window, TITLE_FONT_SIZE, 'SETTINGS', '#b68f40', (400, 100))
-        create_text(self.game_window, SELECTION_FONT_SIZE, 'NICKNAME', position=(450, 250), positioning='midright')
-        create_text(self.game_window, SELECTION_FONT_SIZE, settings.player_nickname, position=(600, 250))
-        create_text(self.game_window, SELECTION_FONT_SIZE, 'CAR', position=(450, 300), positioning='midright')
-        create_text(self.game_window, SELECTION_FONT_SIZE, settings.selected_car_name, position=(600, 300))
-        create_text(self.game_window, SELECTION_FONT_SIZE, 'TRACK', position=(450, 350), positioning='midright')
-        create_text(self.game_window, SELECTION_FONT_SIZE, settings.selected_track_name, position=(600, 350))
-        create_text(self.game_window, SELECTION_FONT_SIZE, 'LAPS', position=(450, 400), positioning='midright')
-        create_text(self.game_window, SELECTION_FONT_SIZE, str(settings.selected_laps), position=(600, 400))
-        create_text(self.game_window, SELECTION_FONT_SIZE, 'OPPONENTS', position=(450, 450), positioning='midright')
-        create_text(self.game_window, SELECTION_FONT_SIZE, str(settings.opponents), position=(600, 450))
-        create_text(self.game_window, SELECTION_FONT_SIZE, 'OPPONENTS LEVEL', position=(450, 500), positioning='midright')
-        create_text(self.game_window, SELECTION_FONT_SIZE, str(settings.opponents_level), position=(600, 500))
-        create_text(self.game_window, SELECTION_FONT_SIZE, 'STARTING POSITION', position=(450, 550), positioning='midright')
-        create_text(self.game_window, SELECTION_FONT_SIZE, str(settings.selected_starting_position), position=(600, 550))
+        left_pos = 450
+        right_pos = 600
+        top_pos = 250
+        interval = 50
+
+        create_text(
+            self.game_window,
+            TITLE_FONT_SIZE,
+            'SETTINGS',
+            '#b68f40',
+            (400, 100)
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            'NICKNAME',
+            position=(left_pos, top_pos),
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            settings.player_nickname,
+            position=(right_pos, top_pos)
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            'CAR',
+            position=(left_pos, top_pos + interval),
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            settings.selected_car_name,
+            position=(right_pos, top_pos + interval)
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            'TRACK',
+            position=(left_pos, top_pos + interval * 2),
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            settings.selected_track_name,
+            position=(right_pos, top_pos + interval * 2)
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            'LAPS',
+            position=(left_pos, top_pos + interval * 3),
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(settings.selected_laps),
+            position=(right_pos, top_pos + interval * 3)
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            'OPPONENTS',
+            position=(left_pos, top_pos + interval * 4),
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(settings.opponents),
+            position=(right_pos, top_pos + interval * 4)
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            'OPPONENTS LEVEL',
+            position=(left_pos, top_pos + interval * 5),
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(settings.opponents_level),
+            position=(right_pos, top_pos + interval * 5)
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            'STARTING POSITION',
+            position=(left_pos, top_pos + interval * 6),
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(settings.selected_starting_position),
+            position=(right_pos, top_pos + interval * 6)
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            'PENALTIES',
+            position=(left_pos, top_pos + interval * 7),
+            positioning='midright'
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(settings.penalties),
+            position=(right_pos, top_pos + interval * 7)
+        )
 
     @staticmethod
     def create_main_menu_buttons() -> dict[str, Button]:
@@ -242,86 +355,105 @@ class Menu:
 
     @staticmethod
     def create_settings_buttons() -> dict[str, Button]:
+        left_pos = 500
+        right_pos = 700
+        top_pos = 300
+        interval = 50
+
         return {
             'select_car_previous': Button(
-                position=(500, 300),
+                position=(left_pos, top_pos),
                 text_input='<',
                 font=get_font(SELECTION_FONT_SIZE),
                 base_color='#d7fcd4',
                 hover_color='white'
             ),
             'select_car_next': Button(
-                position=(700, 300),
+                position=(right_pos, top_pos),
                 text_input='>',
                 font=get_font(SELECTION_FONT_SIZE),
                 base_color='#d7fcd4',
                 hover_color='white'
             ),
             'select_track_previous': Button(
-                position=(500, 350),
+                position=(left_pos, top_pos + interval),
                 text_input='<',
                 font=get_font(SELECTION_FONT_SIZE),
                 base_color='#d7fcd4',
                 hover_color='white'
             ),
             'select_track_next': Button(
-                position=(700, 350),
+                position=(right_pos, top_pos + interval),
                 text_input='>',
                 font=get_font(SELECTION_FONT_SIZE),
                 base_color='#d7fcd4',
                 hover_color='white'
             ),
             'select_laps_previous': Button(
-                position=(500, 400),
+                position=(left_pos, top_pos + interval * 2),
                 text_input='<',
                 font=get_font(SELECTION_FONT_SIZE),
                 base_color='#d7fcd4',
                 hover_color='white'
             ),
             'select_laps_next': Button(
-                position=(700, 400),
+                position=(right_pos, top_pos + interval * 2),
                 text_input='>',
                 font=get_font(SELECTION_FONT_SIZE),
                 base_color='#d7fcd4',
                 hover_color='white'
             ),
             'select_opponents_previous': Button(
-                position=(500, 450),
+                position=(left_pos, top_pos + interval * 3),
                 text_input='<',
                 font=get_font(SELECTION_FONT_SIZE),
                 base_color='#d7fcd4',
                 hover_color='white'
             ),
             'select_opponents_next': Button(
-                position=(700, 450),
+                position=(right_pos, top_pos + interval * 3),
                 text_input='>',
                 font=get_font(SELECTION_FONT_SIZE),
                 base_color='#d7fcd4',
                 hover_color='white'
             ),
             'select_opponents_level_previous': Button(
-                position=(500, 500),
+                position=(left_pos, top_pos + interval * 4),
                 text_input='<',
                 font=get_font(SELECTION_FONT_SIZE),
                 base_color='#d7fcd4',
                 hover_color='white'
             ),
             'select_opponents_level_next': Button(
-                position=(700, 500),
+                position=(right_pos, top_pos + interval * 4),
                 text_input='>',
                 font=get_font(SELECTION_FONT_SIZE),
                 base_color='#d7fcd4',
                 hover_color='white'
             ),
             'select_starting_position_previous': Button(
-                position=(500, 550),
+                position=(left_pos, top_pos + interval * 5),
                 text_input='<',
                 font=get_font(SELECTION_FONT_SIZE),
                 base_color='#d7fcd4',
                 hover_color='white'
             ),
             'select_starting_position_next': Button(
-                position=(700, 550),
+                position=(right_pos, top_pos + interval * 5),
+                text_input='>',
+                font=get_font(SELECTION_FONT_SIZE),
+                base_color='#d7fcd4',
+                hover_color='white'
+            ),
+            'select_penalties_previous': Button(
+                position=(left_pos, top_pos + interval * 6),
+                text_input='<',
+                font=get_font(SELECTION_FONT_SIZE),
+                base_color='#d7fcd4',
+                hover_color='white'
+            ),
+            'select_penalties_next': Button(
+                position=(right_pos, top_pos + interval * 6),
                 text_input='>',
                 font=get_font(SELECTION_FONT_SIZE),
                 base_color='#d7fcd4',

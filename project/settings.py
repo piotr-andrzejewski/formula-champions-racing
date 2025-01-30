@@ -16,58 +16,7 @@ LAPS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 OPPONENTS = [0, 1, 2, 3, 4, 5, 6, 7]
 OPPONENTS_LEVEL = [1, 2, 3]
 STARTING_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 'RANDOM']
-
-
-def create_track_position_name(track_name: str, position: int) -> str:
-    track_position_name = track_name.replace(' ', '_') + '_' + str(position)
-
-    return track_position_name
-
-
-def remove_random_from_starting_positions(starting_positions: list[int | str]) -> list[int]:
-    starting_positions.remove('RANDOM')
-
-    return starting_positions
-
-
-def get_available_starting_positions(
-        starting_positions: list[int | str],
-        occupied_positions: list[int] = None
-) -> list[int]:
-    if occupied_positions is None:
-        occupied_positions = []
-
-    available_starting_positions = starting_positions.copy()
-
-    for occupied_position in occupied_positions:
-        available_starting_positions.remove(occupied_position)
-
-    return remove_random_from_starting_positions(available_starting_positions)
-
-
-def get_opponent_starting_position(
-        occupied_starting_positions: list[int]
-) -> int:
-    available_starting_positions = get_available_starting_positions(STARTING_POSITIONS, occupied_starting_positions)
-    position = random.randint(available_starting_positions[0], available_starting_positions[-1])
-
-    while position in occupied_starting_positions:
-        position = random.randint(available_starting_positions[0], available_starting_positions[-1])
-
-    return position
-
-
-def get_opponent_car(occupied_cars: list[Surface]) -> Surface:
-    available_cars = CARS.copy()
-
-    for car in occupied_cars:
-        available_cars.remove(car)
-
-    return available_cars[0]
-
-
-def get_random_starting_position() -> int:
-    return random.randint(STARTING_POSITIONS[0], STARTING_POSITIONS[-2])
+PENALTIES = ['OFF', 'ON']
 
 
 class Settings:
@@ -81,7 +30,8 @@ class Settings:
             laps: int = LAPS[0],
             opponents: int = OPPONENTS[0],
             opponents_level: int = OPPONENTS_LEVEL[0],
-            start_pos: int = STARTING_POSITIONS[0]
+            start_pos: int = STARTING_POSITIONS[0],
+            penalties: str = PENALTIES[0]
     ) -> None:
 
         if player_nickname == '':
@@ -98,6 +48,7 @@ class Settings:
         self.starting_position = start_pos
         self.selected_starting_position = self.starting_position
         self.occupied_starting_positions = []
+        self.penalties = penalties
 
     def reset(self) -> None:
         self.selected_car = CARS[0]
@@ -110,20 +61,76 @@ class Settings:
         self.starting_position = STARTING_POSITIONS[0]
         self.selected_starting_position = self.starting_position
         self.occupied_starting_positions = []
+        self.penalties = PENALTIES[0]
 
     def get_player_starting_track_position(self) -> tuple[float, float]:
         starting_position = self.selected_starting_position
 
         if starting_position == 'RANDOM':
-            starting_position = get_random_starting_position()
+            starting_position = self.get_random_starting_position()
             self.starting_position = starting_position
 
         self.occupied_starting_positions.append(self.starting_position)
 
-        return TRACK_POSITIONS[create_track_position_name(self.selected_track_name, self.starting_position)]
+        return TRACK_POSITIONS[self.create_track_position_name(self.selected_track_name, self.starting_position)]
 
     def get_opponent_starting_track_position(self) -> tuple[float, float]:
-        opponent_starting_position = get_opponent_starting_position(self.occupied_starting_positions)
+        opponent_starting_position = self.get_opponent_starting_position(self.occupied_starting_positions)
         self.occupied_starting_positions.append(opponent_starting_position)
 
-        return TRACK_POSITIONS[create_track_position_name(self.selected_track_name, opponent_starting_position)]
+        return TRACK_POSITIONS[self.create_track_position_name(self.selected_track_name, opponent_starting_position)]
+
+    def get_available_starting_positions(
+            self,
+            starting_positions: list[int | str],
+            occupied_positions: list[int] = None
+    ) -> list[int]:
+        if occupied_positions is None:
+            occupied_positions = []
+
+        available_starting_positions = starting_positions.copy()
+
+        for occupied_position in occupied_positions:
+            available_starting_positions.remove(occupied_position)
+
+        return self.remove_random_from_starting_positions(available_starting_positions)
+
+    def get_opponent_starting_position(
+            self,
+            occupied_starting_positions: list[int]
+    ) -> int:
+        available_starting_positions = self.get_available_starting_positions(
+            STARTING_POSITIONS,
+            occupied_starting_positions
+        )
+        position = random.randint(available_starting_positions[0], available_starting_positions[-1])
+
+        while position in occupied_starting_positions:
+            position = random.randint(available_starting_positions[0], available_starting_positions[-1])
+
+        return position
+
+    @staticmethod
+    def create_track_position_name(track_name: str, position: int) -> str:
+        track_position_name = track_name.replace(' ', '_') + '_' + str(position)
+
+        return track_position_name
+
+    @staticmethod
+    def remove_random_from_starting_positions(starting_positions: list[int | str]) -> list[int]:
+        starting_positions.remove('RANDOM')
+
+        return starting_positions
+
+    @staticmethod
+    def get_opponent_car(occupied_cars: list[Surface]) -> Surface:
+        available_cars = CARS.copy()
+
+        for car in occupied_cars:
+            available_cars.remove(car)
+
+        return available_cars[0]
+
+    @staticmethod
+    def get_random_starting_position() -> int:
+        return random.randint(STARTING_POSITIONS[0], STARTING_POSITIONS[-2])

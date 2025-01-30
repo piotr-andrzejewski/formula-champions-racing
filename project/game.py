@@ -46,11 +46,17 @@ class Game:
         self.started = False
         self.game_start_time = 0.0
         self.game_total_time = 0.0
+        self.start_time_out_of_track = 0.0
+        self.time_out_of_track = 0.0
+        self.penalty = False
 
     def reset(self) -> None:
         self.started = False
         self.game_start_time = 0.0
         self.game_total_time = 0.0
+        self.start_time_out_of_track = 0.0
+        self.time_out_of_track = 0.0
+        self.penalty = False
         self.player.reset()
         self.settings.occupied_starting_positions = []
 
@@ -167,6 +173,12 @@ class Game:
             if self.player.completed_laps == self.settings.selected_laps:
                 self.show_results()
 
+            if self.player.out_of_track:
+                self.determine_penalty(self.time_out_of_track)
+                if self.penalty:
+                    self.display_penalty_text(self.penalty)
+                    self.player.score -= 1
+
             pygame.display.update()
 
     def check_events(self, buttons: dict[str, Button] = None, mouse_pos: tuple[int, int] = (0, 0)) -> None:
@@ -251,12 +263,17 @@ class Game:
                     self.player.rotate(right=True)
 
     def handle_out_of_track(self) -> None:
-
-        # TODO: handle track limits for potential penalties when player turns on such option
         if self.player.collide(TRACK_1_LIMITS_MASK, *TRACK_1_LIMITS_POSITION) is None:
             self.player.out_of_track = True
+
+            if self.start_time_out_of_track == 0.0:
+                self.start_time_out_of_track = round(time.time(), 3)
+            else:
+                self.time_out_of_track = round(time.time() - self.start_time_out_of_track, 3)
         else:
             self.player.out_of_track = False
+            self.start_time_out_of_track = 0.0
+            self.time_out_of_track = 0.0
 
     def handle_finish_line_crossing(self) -> None:
         for opponent in self.opponents:
@@ -320,7 +337,7 @@ class Game:
             if pressed_keys[pygame.K_SPACE]:
                 self.opponents[i].path.append((self.player.x_pos, self.player.y_pos))
 
-    def get_best_lap(self) -> int | None:
+    def get_best_lap(self) -> float | None:
         self.player.find_best_lap()
 
         if self.player.best_lap is not None:
@@ -370,21 +387,21 @@ class Game:
             self.game_window,
             GAME_INFO_FONT_SIZE,
             'TOTAL TIME:',
-            position=(left_pos, top_pos + 2 * interval),
+            position=(left_pos, top_pos + interval * 2),
             positioning='midright'
         )
         create_text(
             self.game_window,
             GAME_INFO_FONT_SIZE,
             'VELOCITY:',
-            position=(left_pos, top_pos + 3 * interval),
+            position=(left_pos, top_pos + interval * 3),
             positioning='midright'
         )
         create_text(
             self.game_window,
             GAME_INFO_FONT_SIZE,
             str(round(self.player.vel, 2)),
-            position=(right_pos, top_pos + 3 * interval),
+            position=(right_pos, top_pos + interval * 3),
             positioning='midright'
         )
 
@@ -407,7 +424,7 @@ class Game:
                 self.game_window,
                 GAME_INFO_FONT_SIZE,
                 str(self.get_game_total_time()),
-                position=(right_pos, top_pos + 2 * interval),
+                position=(right_pos, top_pos + interval * 2),
                 positioning='midright'
             )
         else:
@@ -429,11 +446,11 @@ class Game:
                 self.game_window,
                 GAME_INFO_FONT_SIZE,
                 str(self.game_total_time),
-                position=(right_pos, top_pos + 2 * interval),
+                position=(right_pos, top_pos + interval * 2),
                 positioning='midright'
             )
 
-    def display_back_to_track_text(self):
+    def display_back_to_track_text(self) -> None:
         create_text(
             self.game_window,
             SECONDARY_FONT_SIZE,
@@ -442,13 +459,39 @@ class Game:
             position=(400, 400)
         )
 
-    def display_wrong_way_text(self):
+    def display_wrong_way_text(self) -> None:
         create_text(
             self.game_window,
             SECONDARY_FONT_SIZE,
             'WRONG WAY',
             color='#b68f40',
             position=(400, 400)
+        )
+
+    def determine_penalty(self, time_out_of_track: float = 0.0) -> None:
+        if self.settings.penalties == 'ON':
+            if time_out_of_track == 0.0:
+                return
+
+            penalty_threshold = 5.0
+
+            if time_out_of_track > penalty_threshold:
+                self.penalty = True
+            else:
+                self.penalty = False
+
+        return
+
+    def display_penalty_text(self, penalty: bool = False) -> None:
+        if not penalty:
+            return
+
+        create_text(
+            self.game_window,
+            SECONDARY_FONT_SIZE,
+            'PENALTY',
+            color='#b68f40',
+            position=(400, 300)
         )
 
     def create_results_texts(self) -> None:
