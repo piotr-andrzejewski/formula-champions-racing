@@ -54,24 +54,22 @@ class Game:
         self.player.reset()
         self.settings.occupied_starting_positions = []
 
-        for opponent in self.opponents:
+        for key, opponent in self.opponents.items():
             opponent.reset()
 
     def generate_player(self) -> PlayerCar:
         return PlayerCar(img=self.settings.selected_car, start_pos=self.settings.get_player_starting_track_position())
 
-    def generate_opponents(self) -> list[ComputerCar]:
+    def generate_opponents(self) -> dict[int, ComputerCar]:
         occupied_cars = [self.settings.selected_car]
-        opponents = []
+        opponents = {}
 
         for i in range(self.settings.opponents):
-            computer_car = get_opponent_car(occupied_cars)
-            opponents.append(
-                ComputerCar(
-                    img=computer_car,
-                    level=self.settings.opponents_level,
-                    start_pos=self.settings.get_opponent_starting_track_position()
-                )
+            computer_car = self.settings.get_opponent_car(occupied_cars)
+            opponents[i] = ComputerCar(
+                img=computer_car,
+                level=self.settings.opponents_level,
+                start_pos=self.settings.get_opponent_starting_track_position()
             )
             occupied_cars.append(computer_car)
 
@@ -83,16 +81,16 @@ class Game:
         self.game_window.fill((0, 70, 0))
         self.draw()
 
-        # for i in range(len(lights)):
-        #     self.check_events()
-        #     self.game_window.blit(lights[i],(x_pos, y_pos))
-        #     pygame.display.update()
-        #     time.sleep(1)
-        #
-        # self.game_window.blit(lights[0], (x_pos, y_pos))
-        # pygame.display.update()
-        # blit_screen(self.game_window)
-        # self.game_window.fill((0, 70, 0))
+        for i in range(len(lights)):
+            self.check_events()
+            self.game_window.blit(lights[i],(x_pos, y_pos))
+            pygame.display.update()
+            time.sleep(1)
+
+        self.game_window.blit(lights[0], (x_pos, y_pos))
+        pygame.display.update()
+        blit_screen(self.game_window)
+        self.game_window.fill((0, 70, 0))
 
         self.started = True
 
@@ -164,9 +162,6 @@ class Game:
             self.handle_out_of_track()
             self.handle_finish_line_crossing()
 
-            if self.player.completed_laps == self.settings.selected_laps:
-                self.show_results()
-
             if self.player.out_of_track:
                 self.determine_penalty(self.time_out_of_track)
                 if self.penalty:
@@ -175,6 +170,13 @@ class Game:
 
             if self.player.score < 0:
                 self.player.score = 0
+
+            if self.player.completed_laps == self.settings.selected_laps:
+                for key, opponent in self.opponents.items():
+                    if opponent.completed_laps == self.settings.selected_laps:
+                        self.player.final_position += 1
+
+                self.show_results()
 
             pygame.display.update()
 
@@ -209,7 +211,7 @@ class Game:
 
         self.player.draw(self.game_window)
 
-        for opponent in self.opponents:
+        for key, opponent in self.opponents.items():
             opponent.draw(self.game_window)
 
         pygame.display.update()
@@ -273,7 +275,7 @@ class Game:
             self.time_out_of_track = 0.0
 
     def handle_finish_line_crossing(self) -> None:
-        for opponent in self.opponents:
+        for key, opponent in self.opponents.items():
             opponent_finish_line_poi = opponent.collide(FINISH_LINE_MASK, *TRACK_1_FINISH_LINE_POSITION)
 
             if opponent_finish_line_poi is not None:
