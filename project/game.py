@@ -10,18 +10,12 @@ from pygame.display import get_surface
 from cars import *
 from images import FINISH_LINE, TRACK_1_LIMITS, LIGHTS, FLAG_FINISH
 from settings import *
-from utils import SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, blit_screen, create_text, get_font, Button, \
-    GAME_INFO_FONT_SIZE
+from utils import *
 
 # constants for the game
 TRACK_1_POSITION = (10, 10)
 TRACK_1_LIMITS_POSITION = (10, 10)
 TRACK_1_FINISH_LINE_POSITION = (535, 762)
-
-# create font for on screen messages
-pygame.font.init()
-GAME_FONT = pygame.font.Font('./assets/Space_Bd_BT_Bold.ttf', 36)
-GAME_FONT.render('START', True, (255, 255, 255), (0, 0, 0))
 
 # set frames per second parameter
 FPS = 60
@@ -89,16 +83,16 @@ class Game:
         self.game_window.fill((0, 70, 0))
         self.draw()
 
-        for i in range(len(lights)):
-            self.check_events()
-            self.game_window.blit(lights[i],(x_pos, y_pos))
-            pygame.display.update()
-            time.sleep(1)
-
-        self.game_window.blit(lights[0], (x_pos, y_pos))
-        pygame.display.update()
-        blit_screen(self.game_window)
-        self.game_window.fill((0, 70, 0))
+        # for i in range(len(lights)):
+        #     self.check_events()
+        #     self.game_window.blit(lights[i],(x_pos, y_pos))
+        #     pygame.display.update()
+        #     time.sleep(1)
+        #
+        # self.game_window.blit(lights[0], (x_pos, y_pos))
+        # pygame.display.update()
+        # blit_screen(self.game_window)
+        # self.game_window.fill((0, 70, 0))
 
         self.started = True
 
@@ -165,7 +159,7 @@ class Game:
             self.draw()
             self.move_player()
 
-            # generate_path_for_computer_car()
+            self.generate_path_for_computer_car()
 
             self.handle_out_of_track()
             self.handle_finish_line_crossing()
@@ -320,22 +314,23 @@ class Game:
 
             # code to get coordinates of mouse position
             mouse_pos = pygame.mouse.get_pos()
-            print(mouse_pos)
 
             # select index of computer car for which you want to create path
             i = 0
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                self.opponents[i].path.append(mouse_pos)
+                print(mouse_pos)
 
-            # code to delete last path point
-            if event.type == pygame.KEYDOWN:
-                if pressed_keys[pygame.K_c]:
-                    self.opponents[i].path.pop()
-
-            # code to add many points from player's position
-            if pressed_keys[pygame.K_SPACE]:
-                self.opponents[i].path.append((self.player.x_pos, self.player.y_pos))
+            #     self.opponents[i].path.append(mouse_pos)
+            #
+            # # code to delete last path point
+            # if event.type == pygame.KEYDOWN:
+            #     if pressed_keys[pygame.K_c]:
+            #         self.opponents[i].path.pop()
+            #
+            # # code to add many points from player's position
+            # if pressed_keys[pygame.K_SPACE]:
+            #     self.opponents[i].path.append((self.player.x_pos, self.player.y_pos))
 
     def get_best_lap(self) -> float | None:
         self.player.find_best_lap()
@@ -470,6 +465,11 @@ class Game:
 
     def determine_penalty(self, time_out_of_track: float = 0.0) -> None:
         if self.settings.penalties == 'ON':
+            if self.player.corner_cut(COLLISION_POINTS['TRACK 1']):
+                self.penalty = True
+
+                return
+
             if time_out_of_track == 0.0:
                 return
 

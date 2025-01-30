@@ -35,8 +35,13 @@ PATHS = {
         (694.0, 672.0), (746.0, 705.0), (723.0, 767.0), (624.0, 778.0), (455.0, 773.0)
     ]
 }
-PATH_POINT_MARGIN = 20.0
-
+POINT_MARGIN = 20.0
+COLLISION_POINTS = {
+    'TRACK 1': [
+        (70, 745), (350, 630), (110, 80), (520, 150),
+        (735, 330), (725, 590), (595, 640), (700, 720)
+    ]
+}
 
 class BaseCar:
     IMG = CAR_1
@@ -154,6 +159,11 @@ class PlayerCar(BaseCar):
         self.angle = 90.0
         self.vel = 0.0
 
+    def corner_cut(self, points: list[tuple[int, int]]) -> bool:
+        for point in points:
+            if math.hypot(point[0] - self.x_pos, point[1] - self.y_pos) < POINT_MARGIN:
+                return True
+
     def find_best_lap(self) -> None:
         lap_times_length = len(self.lap_times)
 
@@ -216,7 +226,7 @@ class ComputerCar(BaseCar):
             self.move_towards(target_x, target_y)
 
             # checking if hypotenuse is smaller than desired margin to move to the next path point
-            if math.hypot(target_x - self.x_pos, target_y - self.y_pos) < PATH_POINT_MARGIN:
+            if math.hypot(target_x - self.x_pos, target_y - self.y_pos) < POINT_MARGIN:
                 self.current_point += 1
 
     # function to interpolate path with cubic splines to make more smooth path to follow
