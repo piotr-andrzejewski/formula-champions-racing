@@ -82,7 +82,14 @@ class Game:
         self.draw()
 
         for i in range(len(lights)):
-            self.check_events()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.end_game()
+                    sys.exit()
+
+                if event.type == KEYDOWN and event.key == pygame.K_ESCAPE:
+                    return
+
             self.game_window.blit(lights[i],(x_pos, y_pos))
             pygame.display.update()
             time.sleep(1)
@@ -108,9 +115,11 @@ class Game:
         started = False
 
         while not started:
-            self.check_events()
-
             for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.end_game()
+                    sys.exit()
+
                 if event.type == KEYDOWN and event.key == pygame.K_ESCAPE:
                     return
 
@@ -123,9 +132,6 @@ class Game:
         self.player.lap_start_time = current_time
 
     def end_game(self) -> None:
-        # print('Laps completed:')
-        # print('Player: ', self.player.completed_laps)
-        #
         # for i in range(len(self.opponents)):
         #     print(f'Opponent {i + 1}: ', self.opponents[i].completed_laps)
         #
@@ -153,12 +159,9 @@ class Game:
             # set max fps for the game
             CLOCK.tick(FPS)
 
-            self.check_events()
             self.draw()
             self.move_player()
-
             self.generate_path_for_computer_car()
-
             self.handle_out_of_track()
             self.handle_finish_line_crossing()
 
@@ -180,31 +183,18 @@ class Game:
 
             pygame.display.update()
 
-    def check_events(self, buttons: dict[str, Button] = None, mouse_pos: tuple[int, int] = (0, 0)) -> None:
-        for event in pygame.event.get():
+    def draw(self) -> None:
+        self.game_window.fill((0, 70, 0))
+        self.draw_track(self.settings.selected_track_name)
+        self.display_info()
 
-            # check the event of user clicking 'X' button to close the game window
+        for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.end_game()
                 sys.exit()
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.end_game()
-
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                self.started = True
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-            #     print(mouse_pos)
-
-                if buttons:
-                    if buttons['back'].check_for_input(mouse_pos):
-                        self.end_game()
-
-    def draw(self) -> None:
-        self.game_window.fill((0, 70, 0))
-        self.draw_track(self.settings.selected_track_name)
-        self.display_info()
 
         if self.player.out_of_track:
             self.display_back_to_track_text()
@@ -307,8 +297,11 @@ class Game:
 
     def generate_path_for_computer_car(self) -> None:
         pressed_keys = pygame.key.get_pressed()
+        mouse_pos = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                print(mouse_pos)
 
             # code to generate points for computer car path
             if event.type == pygame.KEYDOWN:
@@ -317,25 +310,14 @@ class Game:
                     # display player position to better tune computer car's path
                     print((self.player.x_pos, self.player.y_pos))
 
-            # code to get coordinates of mouse position
-            mouse_pos = pygame.mouse.get_pos()
-
-            # select index of computer car for which you want to create path
-            i = 0
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                print(mouse_pos)
-
-            #     self.opponents[i].path.append(mouse_pos)
-            #
+                    # # select index of computer car for which you want to create path
+                    # i = 0
+                    # self.opponents[i].path.append((self.player.x_pos, self.player.y_pos))
+                    #
             # # code to delete last path point
             # if event.type == pygame.KEYDOWN:
             #     if pressed_keys[pygame.K_c]:
             #         self.opponents[i].path.pop()
-            #
-            # # code to add many points from player's position
-            # if pressed_keys[pygame.K_SPACE]:
-            #     self.opponents[i].path.append((self.player.x_pos, self.player.y_pos))
 
     def get_best_lap(self) -> float | None:
         self.player.find_best_lap()
@@ -431,7 +413,19 @@ class Game:
             back_button.change_color(mouse_pos)
             back_button.update(self.game_window)
 
-            self.check_events(buttons={'back': back_button}, mouse_pos=mouse_pos)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.end_game()
+                    sys.exit()
+
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    self.end_game()
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    #     print(mouse_pos)
+
+                    if back_button.check_for_input(mouse_pos):
+                        self.end_game()
 
             pygame.display.update()
 
