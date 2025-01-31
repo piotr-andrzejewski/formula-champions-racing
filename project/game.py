@@ -8,7 +8,7 @@ from pygame import KEYDOWN
 from pygame.display import get_surface
 
 from cars import *
-from images import FINISH_LINE, TRACK_1_LIMITS, LIGHTS, FLAG_FINISH
+from images import FINISH_LINE, TRACK_1_LIMITS, LIGHTS, FLAG_FINISH, FLAG_PENALTY
 from settings import *
 from utils import *
 
@@ -563,6 +563,7 @@ class Game:
             color='#b68f40',
             position=(400, 300)
         )
+        self.game_window.blit(FLAG_PENALTY, (525, 265))
 
     def create_results_texts(self) -> None:
         left_pos, right_pos = 225, 575

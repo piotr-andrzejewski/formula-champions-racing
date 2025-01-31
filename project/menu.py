@@ -10,7 +10,7 @@ from game import Game
 from settings import CARS, TRACKS, LAPS, OPPONENTS, OPPONENTS_LEVEL, STARTING_POSITIONS, CAR_NAMES, TRACK_NAMES, \
     PENALTIES, Settings
 from utils import MAIN_FONT_SIZE, SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, TITLE_FONT_SIZE, \
-    blit_screen, create_text, get_font, Button
+    blit_screen, create_text, get_font, Button, scale_image
 
 # instantiate Settings class
 settings = Settings()
@@ -79,7 +79,7 @@ class Menu:
             mouse_pos = pygame.mouse.get_pos()
             # print(mouse_pos)
 
-            self.create_settings_texts()
+            self.create_settings_items()
 
             buttons = self.create_settings_buttons()
 
@@ -209,7 +209,7 @@ class Menu:
         self.display_main_menu = True
         self.main_menu()
 
-    def create_settings_texts(self) -> None:
+    def create_settings_items(self) -> None:
         left_pos = 450
         right_pos = 600
         top_pos = 250
@@ -242,12 +242,7 @@ class Menu:
             position=(left_pos, top_pos + interval),
             positioning='midright'
         )
-        create_text(
-            self.game_window,
-            SELECTION_FONT_SIZE,
-            settings.selected_car_name,
-            position=(right_pos, top_pos + interval)
-        )
+        self.game_window.blit(pygame.transform.rotate(scale_image(settings.selected_car, 2), 90), (585, 295))
         create_text(
             self.game_window,
             SELECTION_FONT_SIZE,
@@ -255,12 +250,7 @@ class Menu:
             position=(left_pos, top_pos + interval * 2),
             positioning='midright'
         )
-        create_text(
-            self.game_window,
-            SELECTION_FONT_SIZE,
-            settings.selected_track_name,
-            position=(right_pos, top_pos + interval * 2)
-        )
+        self.game_window.blit(scale_image(settings.selected_track, 0.08), (565, 320))
         create_text(
             self.game_window,
             SELECTION_FONT_SIZE,
