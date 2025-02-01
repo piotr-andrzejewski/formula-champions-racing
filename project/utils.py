@@ -11,10 +11,11 @@ from pygame import Surface
 pygame.font.init()
 
 # constants
-TITLE_FONT_SIZE = 100
-MAIN_FONT_SIZE = 75
+TITLE_FONT_SIZE = 80
+MAIN_FONT_SIZE = 70
 SECONDARY_FONT_SIZE = 50
 SELECTION_FONT_SIZE = 25
+HIGHSCORE_FONT_SIZE = 20
 GAME_INFO_FONT_SIZE = 15
 
 
@@ -142,9 +143,35 @@ def file_open_scope(filename: str) -> str:
     return 'r+'
 
 
-def update_csv_file(file: TextIO, data: list) -> None:
-        file.truncate(0)
-        file.seek(0)
-        writer = csv.writer(file)
-        writer.writerows(data)
+def read_highscores_file(filename: str) ->  list[list[int | str]]:
+    with open(filename, file_open_scope(filename), encoding='utf-8', newline='') as file:
+        reader = csv.reader(file)
+        highscores = []
 
+        for row in reader:
+            row_place = int(row[0])
+            row_score = int(row[1])
+            row_nickname = row[2]
+            row_car_name = row[3]
+            row_track_name = row[4]
+            row_best_lap = row[5]
+            row_penalties = row[6]
+            highscores.append([
+                row_place,
+                row_score,
+                row_nickname,
+                row_car_name,
+                row_track_name,
+                row_best_lap,
+                row_penalties
+            ])
+
+    return highscores
+
+
+def update_highscores_file(filename: str, data: list[list[int | str]]) -> None:
+        with open(filename, file_open_scope(filename), encoding='utf-8', newline='') as file:
+            file.truncate(0)
+            file.seek(0)
+            writer = csv.writer(file)
+            writer.writerows(data)

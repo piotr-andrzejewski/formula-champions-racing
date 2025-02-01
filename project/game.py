@@ -655,64 +655,45 @@ class Game:
 
     def save_score(self) -> None:
         filename = 'highscores.csv'
+        highscores = read_highscores_file(filename)
+        size = len(highscores)
 
-        with open(filename, file_open_scope(filename), encoding='utf-8', newline='') as file:
-            reader = csv.reader(file)
-            highscores = []
+        if not size:
+            highscores.append(self.create_score_data(1))
+            update_highscores_file(filename, highscores)
 
-            for row in reader:
-                row_place = int(row[0])
-                row_score = int(row[1])
-                row_nickname = row[2]
-                row_car_name = row[3]
-                row_track_name = row[4]
-                row_best_lap = row[5]
-                highscores.append([
-                    row_place,
-                    row_score,
-                    row_nickname,
-                    row_car_name,
-                    row_track_name,
-                    row_best_lap
-                ])
+            return
 
-            size = len(highscores)
+        score_inserted = False
 
-            if not size:
-                highscores.append(self.create_score_data(1))
-                update_csv_file(file, highscores)
-
-                return
-
-            score_inserted = False
-
-            for i in range(size):
-                if self.player.score > highscores[i][1]:
-                    highscores.insert(i, self.create_score_data(i + 1))
-                    score_inserted = True
-
-                    for j in range(i + 1, size + 1):
-                        highscores[j][0] += 1
-
-                    if len(highscores) > 10:
-                        highscores.pop()
-
-                    break
-
-            if not score_inserted and size < 10:
-                highscores.append(self.create_score_data(size + 1))
-
+        for i in range(size):
+            if self.player.score > highscores[i][1]:
+                highscores.insert(i, self.create_score_data(i + 1))
                 score_inserted = True
 
-            if score_inserted:
-                update_csv_file(file, highscores)
+                for j in range(i + 1, size + 1):
+                    highscores[j][0] += 1
 
-    def create_score_data(self, place: int) -> list:
+                if len(highscores) > 8:
+                    highscores.pop()
+
+                break
+
+        if not score_inserted and size < 8:
+            highscores.append(self.create_score_data(size + 1))
+
+            score_inserted = True
+
+        if score_inserted:
+            update_highscores_file(filename, highscores)
+
+    def create_score_data(self, place: int) ->  list[int | str]:
         return [
             place,
             self.player.score,
             self.settings.player_nickname,
             self.settings.selected_car_name,
             self.settings.selected_track_name,
-            self.player.best_lap
+            self.player.best_lap,
+            self.settings.penalties
         ]

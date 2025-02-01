@@ -1,16 +1,14 @@
 # menus
 
 import sys
-import pygame
-import random
 
+import pygame.constants
 from pygame import Surface
 
 from game import Game
-from settings import CARS, TRACKS, LAPS, OPPONENTS, OPPONENTS_LEVEL, STARTING_POSITIONS, CAR_NAMES, TRACK_NAMES, \
-    PENALTIES, Settings
-from utils import MAIN_FONT_SIZE, SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, TITLE_FONT_SIZE, \
-    blit_screen, create_text, get_font, Button, scale_image
+from images import CUP
+from settings import *
+from utils import *
 
 # instantiate Settings class
 settings = Settings()
@@ -22,14 +20,29 @@ class Menu:
         self.display_main_menu = True
         self.play_game = False
         self.set_options = False
+        self.show_highscores = False
 
     def main_menu(self) -> None:
         while self.display_main_menu:
             self.game_window.fill('black')
+            self.create_header(
+                font_size=MAIN_FONT_SIZE,
+                text='FORMULA',
+                position=(500, 125),
+            )
+            self.create_header(
+                font_size=MAIN_FONT_SIZE,
+                text='CHAMPIONS',
+                position=(500, 200),
+            )
+            self.create_header(
+                font_size=MAIN_FONT_SIZE,
+                text='RACING',
+                position=(500, 275),
+            )
+            self.game_window.blit(scale_image(CUP, 2), (50, 90))
+
             mouse_pos = pygame.mouse.get_pos()
-
-            self.create_main_menu_texts()
-
             buttons = self.create_main_menu_buttons()
 
             for button in buttons.values():
@@ -49,6 +62,11 @@ class Menu:
                         blit_screen(self.game_window)
                         self.run_game()
 
+                    if buttons['highscores'].check_for_input(mouse_pos):
+                        self.show_highscores = True
+                        self.display_main_menu = False
+                        self.highscores_menu()
+
                     if buttons['settings'].check_for_input(mouse_pos):
                         self.set_options = True
                         self.display_main_menu = False
@@ -59,8 +77,22 @@ class Menu:
 
             pygame.display.update()
 
-    def create_main_menu_texts(self) -> None:
-        create_text(self.game_window, TITLE_FONT_SIZE, 'MAIN MENU', '#b68f40', (400, 200))
+    def create_header(
+            self,
+            font_size: int = TITLE_FONT_SIZE,
+            text: str = 'HEADER',
+            color: str = '#b68f40',
+            position: tuple[int, int] = (400, 100),
+            positioning: str = 'center'
+    ) -> None:
+        create_text(
+            self.game_window,
+            font_size,
+            text,
+            color,
+            position,
+            positioning
+        )
 
     def run_game(self) -> None:
         self.play_game = True
@@ -70,6 +102,39 @@ class Menu:
         game.run()
         self.back_to_main_menu()
 
+    def highscores_menu(self) -> None:
+        self.show_highscores = True
+        self.display_main_menu = False
+        filename = 'highscores.csv'
+        highscores = read_highscores_file(filename)
+
+        while self.show_highscores:
+            self.game_window.fill('black')
+            mouse_pos = pygame.mouse.get_pos()
+
+            self.create_header(font_size=MAIN_FONT_SIZE, text='HIGHSCORES', position=(400, 100))
+            self.create_highscores_labels()
+
+            for i in range(len(highscores)):
+                self.create_highscores_row(highscores[i], i + 1)
+
+            back_button = self.create_back_button()
+            back_button.change_color(mouse_pos)
+            back_button.update(self.game_window)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quit_game()
+
+                if event.type == pygame.KEYDOWN and event.key == pygame.constants.K_ESCAPE:
+                    self.back_to_main_menu()
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if back_button.check_for_input(mouse_pos):
+                        self.back_to_main_menu()
+
+            pygame.display.update()
+
     def settings_menu(self) -> None:
         self.set_options = True
         self.display_main_menu = False
@@ -78,10 +143,11 @@ class Menu:
             self.game_window.fill('black')
             mouse_pos = pygame.mouse.get_pos()
             # print(mouse_pos)
-
+            self.create_header(font_size=MAIN_FONT_SIZE, text='SETTINGS', position=(400, 100))
             self.create_settings_items()
 
             buttons = self.create_settings_buttons()
+            buttons['back'] = self.create_back_button()
 
             for button in buttons.values():
                 button.change_color(mouse_pos)
@@ -206,8 +272,105 @@ class Menu:
     def back_to_main_menu(self) -> None:
         self.play_game = False
         self.set_options = False
+        self.show_highscores = False
         self.display_main_menu = True
         self.main_menu()
+
+    def create_highscores_labels(self) -> None:
+        left_pos = 40
+        top_pos = 200
+        interval = 100
+
+        create_text(
+            self.game_window,
+            GAME_INFO_FONT_SIZE,
+            'PLACE',
+            position=(left_pos, top_pos),
+        )
+        create_text(
+            self.game_window,
+            GAME_INFO_FONT_SIZE,
+            'SCORE',
+            position=(left_pos + interval, top_pos),
+        )
+        create_text(
+            self.game_window,
+            GAME_INFO_FONT_SIZE,
+            'NICKNAME',
+            position=(left_pos + interval * 2 + 30, top_pos),
+        )
+        create_text(
+            self.game_window,
+            GAME_INFO_FONT_SIZE,
+            'CAR',
+            position=(left_pos + interval * 3 + 50, top_pos)
+        )
+        create_text(
+            self.game_window,
+            GAME_INFO_FONT_SIZE,
+            'TRACK',
+            position=(left_pos + interval * 4 + 60, top_pos)
+        )
+        create_text(
+            self.game_window,
+            GAME_INFO_FONT_SIZE,
+            'BEST LAP',
+            position=(left_pos + interval * 5 + 90, top_pos)
+        )
+        create_text(
+            self.game_window,
+            GAME_INFO_FONT_SIZE,
+            'PENALTIES',
+            position=(left_pos + interval * 6 + 100, top_pos)
+        )
+
+    def create_highscores_row(self, data: list[int | str], row_number: int) -> None:
+        left_pos = 40
+        top_pos = 200 + 50 * row_number
+        interval = 100
+
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(data[0]),
+            position=(left_pos, top_pos),
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(data[1]),
+            position=(left_pos + interval, top_pos),
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(data[2]),
+            position=(left_pos + interval * 2 + 30, top_pos),
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(data[3]),
+            position=(left_pos + interval * 3 + 50, top_pos)
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(data[4]),
+            position=(left_pos + interval * 4 + 60, top_pos)
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(data[5]),
+            position=(left_pos + interval * 5 + 90, top_pos)
+        )
+        create_text(
+            self.game_window,
+            SELECTION_FONT_SIZE,
+            str(data[6]),
+            position=(left_pos + interval * 6 + 100, top_pos)
+        )
 
     def create_settings_items(self) -> None:
         left_pos = 450
@@ -215,13 +378,6 @@ class Menu:
         top_pos = 250
         interval = 50
 
-        create_text(
-            self.game_window,
-            TITLE_FONT_SIZE,
-            'SETTINGS',
-            '#b68f40',
-            (400, 100)
-        )
         create_text(
             self.game_window,
             SELECTION_FONT_SIZE,
@@ -319,27 +475,30 @@ class Menu:
 
     @staticmethod
     def create_main_menu_buttons() -> dict[str, Button]:
+        x_pos = 400
+        y_pox_top = 425
+        interval = 80
+
         return {
-            'play': Button(
-                position=(400, 400),
-                text_input='PLAY',
-                font=get_font(MAIN_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+            'play': create_button(
+                position=(x_pos, y_pox_top),
+                text='PLAY',
+                font_size=SECONDARY_FONT_SIZE
             ),
-            'settings': Button(
-                position=(400, 500),
-                text_input='SETTINGS',
-                font=get_font(MAIN_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+            'settings': create_button(
+                position=(x_pos, y_pox_top + interval),
+                text='SETTINGS',
+                font_size=SECONDARY_FONT_SIZE
             ),
-            'quit': Button(
-                position=(400, 600),
-                text_input='QUIT',
-                font=get_font(MAIN_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+            'highscores': create_button(
+                position=(x_pos, y_pox_top + interval * 2),
+                text='HIGHSCORES',
+                font_size=SECONDARY_FONT_SIZE
+            ),
+            'quit': create_button(
+                position=(x_pos, y_pox_top + interval * 3),
+                text='QUIT',
+                font_size=SECONDARY_FONT_SIZE
             )
         }
 
@@ -351,112 +510,88 @@ class Menu:
         interval = 50
 
         return {
-            'select_car_previous': Button(
+            'select_car_previous': create_button(
                 position=(left_pos, top_pos),
-                text_input='<',
-                font=get_font(SELECTION_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+                text='<',
+                font_size=SELECTION_FONT_SIZE
             ),
-            'select_car_next': Button(
+            'select_car_next': create_button(
                 position=(right_pos, top_pos),
-                text_input='>',
-                font=get_font(SELECTION_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+                text='>',
+                font_size=SELECTION_FONT_SIZE
             ),
-            'select_track_previous': Button(
+            'select_track_previous': create_button(
                 position=(left_pos, top_pos + interval),
-                text_input='<',
-                font=get_font(SELECTION_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+                text='<',
+                font_size=SELECTION_FONT_SIZE
             ),
-            'select_track_next': Button(
+            'select_track_next': create_button(
                 position=(right_pos, top_pos + interval),
-                text_input='>',
-                font=get_font(SELECTION_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+                text='>',
+                font_size=SELECTION_FONT_SIZE
             ),
-            'select_laps_previous': Button(
+            'select_laps_previous': create_button(
                 position=(left_pos, top_pos + interval * 2),
-                text_input='<',
-                font=get_font(SELECTION_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+                text='<',
+                font_size=SELECTION_FONT_SIZE
             ),
-            'select_laps_next': Button(
+            'select_laps_next': create_button(
                 position=(right_pos, top_pos + interval * 2),
-                text_input='>',
-                font=get_font(SELECTION_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+                text='>',
+                font_size=SELECTION_FONT_SIZE
             ),
-            'select_opponents_previous': Button(
+            'select_opponents_previous': create_button(
                 position=(left_pos, top_pos + interval * 3),
-                text_input='<',
-                font=get_font(SELECTION_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+                text='<',
+                font_size=SELECTION_FONT_SIZE
             ),
-            'select_opponents_next': Button(
+            'select_opponents_next': create_button(
                 position=(right_pos, top_pos + interval * 3),
-                text_input='>',
-                font=get_font(SELECTION_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+                text='>',
+                font_size=SELECTION_FONT_SIZE
             ),
-            'select_opponents_level_previous': Button(
+            'select_opponents_level_previous': create_button(
                 position=(left_pos, top_pos + interval * 4),
-                text_input='<',
-                font=get_font(SELECTION_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+                text='<',
+                font_size=SELECTION_FONT_SIZE
             ),
-            'select_opponents_level_next': Button(
+            'select_opponents_level_next': create_button(
                 position=(right_pos, top_pos + interval * 4),
-                text_input='>',
-                font=get_font(SELECTION_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+                text='>',
+                font_size=SELECTION_FONT_SIZE
             ),
-            'select_starting_position_previous': Button(
+            'select_starting_position_previous': create_button(
                 position=(left_pos, top_pos + interval * 5),
-                text_input='<',
-                font=get_font(SELECTION_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+                text='<',
+                font_size=SELECTION_FONT_SIZE
             ),
-            'select_starting_position_next': Button(
+            'select_starting_position_next': create_button(
                 position=(right_pos, top_pos + interval * 5),
-                text_input='>',
-                font=get_font(SELECTION_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+                text='>',
+                font_size=SELECTION_FONT_SIZE
             ),
-            'select_penalties_previous': Button(
+            'select_penalties_previous': create_button(
                 position=(left_pos, top_pos + interval * 6),
-                text_input='<',
-                font=get_font(SELECTION_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+                text='<',
+                font_size=SELECTION_FONT_SIZE
             ),
-            'select_penalties_next': Button(
+            'select_penalties_next': create_button(
                 position=(right_pos, top_pos + interval * 6),
-                text_input='>',
-                font=get_font(SELECTION_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
-            ),
-            'back': Button(
-                position=(125, 700),
-                text_input='BACK',
-                font=get_font(SECONDARY_FONT_SIZE),
-                base_color='#d7fcd4',
-                hover_color='white'
+                text='>',
+                font_size=SELECTION_FONT_SIZE
             )
         }
+
+    @staticmethod
+    def create_back_button(
+            position: tuple[int, int] = (125, 700),
+            font_size: int = SECONDARY_FONT_SIZE
+    ) -> Button:
+        return create_button(
+            position=position,
+            text='BACK',
+            font_size=font_size
+        )
 
     @staticmethod
     def quit_game() -> None:
