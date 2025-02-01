@@ -403,13 +403,18 @@ class Game:
         self.get_best_lap()
         self.get_game_total_time()
         self.calculate_score()
+        self.save_score()
 
         while self.started:
             mouse_pos = pygame.mouse.get_pos()
             self.create_results_texts()
             self.game_window.blit(FLAG_FINISH, (470, 225))
 
-            back_button = self.create_back_button()
+            back_button = create_button(
+                position=(400, 600),
+                text='BACK',
+                font_size=SELECTION_FONT_SIZE,
+            )
             back_button.change_color(mouse_pos)
             back_button.update(self.game_window)
 
@@ -648,12 +653,66 @@ class Game:
             positioning='midright'
         )
 
-    @staticmethod
-    def create_back_button() -> Button:
-        return Button(
-            position=(400, 600),
-            text_input='BACK',
-            font=get_font(SELECTION_FONT_SIZE),
-            base_color='#d7fcd4',
-            hover_color='white'
-        )
+    def save_score(self) -> None:
+        filename = 'highscores.csv'
+
+        with open(filename, file_open_scope(filename), encoding='utf-8', newline='') as file:
+            reader = csv.reader(file)
+            highscores = []
+
+            for row in reader:
+                row_place = int(row[0])
+                row_score = int(row[1])
+                row_nickname = row[2]
+                row_car_name = row[3]
+                row_track_name = row[4]
+                row_best_lap = row[5]
+                highscores.append([
+                    row_place,
+                    row_score,
+                    row_nickname,
+                    row_car_name,
+                    row_track_name,
+                    row_best_lap
+                ])
+
+            size = len(highscores)
+
+            if not size:
+                highscores.append(self.create_score_data(1))
+                update_csv_file(file, highscores)
+
+                return
+
+            score_inserted = False
+
+            for i in range(size):
+                if self.player.score > highscores[i][1]:
+                    highscores.insert(i, self.create_score_data(i + 1))
+                    score_inserted = True
+
+                    for j in range(i + 1, size + 1):
+                        highscores[j][0] += 1
+
+                    if len(highscores) > 10:
+                        highscores.pop()
+
+                    break
+
+            if not score_inserted and size < 10:
+                highscores.append(self.create_score_data(size + 1))
+
+                score_inserted = True
+
+            if score_inserted:
+                update_csv_file(file, highscores)
+
+    def create_score_data(self, place: int) -> list:
+        return [
+            place,
+            self.player.score,
+            self.settings.player_nickname,
+            self.settings.selected_car_name,
+            self.settings.selected_track_name,
+            self.player.best_lap
+        ]
