@@ -104,7 +104,7 @@ def calculate_vel_factor(img: Surface) -> float:
     elif img == CAR_2:
         return 0.96
     elif img == CAR_3:
-        return 1
+        return 1.0
     elif img == CAR_4:
         return 0.93
     elif img == CAR_5:
@@ -113,7 +113,7 @@ def calculate_vel_factor(img: Surface) -> float:
         return 0.9
     elif img == CAR_7:
         return 0.91
-    elif img == CAR_8:
+    else:
         return 0.93
 
 

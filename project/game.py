@@ -4,13 +4,14 @@ import sys
 import time
 
 import pygame.time
-from pygame import KEYDOWN
-from pygame.display import get_surface
+from pygame import Surface
 
-from cars import *
-from images import FINISH_LINE, TRACK_1_LIMITS, LIGHTS, FLAG_FINISH, FLAG_PENALTY
-from settings import *
-from utils import *
+from cars import COLLISION_POINTS, calculate_vel_factor, PlayerCar, ComputerCar
+from images import FINISH_LINE, FLAG_FINISH, FLAG_PENALTY, LIGHTS, TRACK_1, TRACK_2, TRACK_3, TRACK_1_LIMITS, \
+    TRACK_2_LIMITS, TRACK_3_LIMITS
+from settings import LAPS, Settings
+from utils import GAME_INFO_FONT_SIZE, SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, \
+    blit_screen, create_button, create_text, read_highscores_file, update_highscores_file
 
 # constants for the game
 TRACK_1_POSITION = (10, 10)
@@ -87,7 +88,7 @@ class Game:
                     self.end_game()
                     sys.exit()
 
-                if event.type == KEYDOWN and event.key == pygame.K_ESCAPE:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     return
 
             self.game_window.blit(lights[i],(x_pos, y_pos))
@@ -120,10 +121,10 @@ class Game:
                     self.end_game()
                     sys.exit()
 
-                if event.type == KEYDOWN and event.key == pygame.K_ESCAPE:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     return
 
-                if event.type == KEYDOWN and event.key == pygame.K_SPACE:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     started = True
 
         self.count_to_start_race()
@@ -154,7 +155,6 @@ class Game:
 
         # main loop for the game
         while self.started:
-            # mouse_pos = pygame.mouse.get_pos()
 
             # set max fps for the game
             CLOCK.tick(FPS)
@@ -210,12 +210,12 @@ class Game:
         if track_name == 'TRACK 1':
             for img, pos in TRACK_1_IMAGES:
                 self.game_window.blit(img, pos)
-        # elif track_name == "TRACK 2":
-        #     for img, pos in TRACK_2_IMAGES:
-        #         self.game_window.blit(img, pos)
-        # elif track_name == "TRACK 3":
-        #     for img, pos in TRACK_3_IMAGES:
-        #         self.game_window.blit(img, pos)
+        elif track_name == "TRACK 2":
+            for img, pos in TRACK_2_IMAGES:
+                self.game_window.blit(img, pos)
+        elif track_name == "TRACK 3":
+            for img, pos in TRACK_3_IMAGES:
+                self.game_window.blit(img, pos)
 
     def move_player(self) -> None:
         keys = pygame.key.get_pressed()
@@ -406,10 +406,10 @@ class Game:
         self.save_score()
 
         while self.started:
-            mouse_pos = pygame.mouse.get_pos()
             self.create_results_texts()
             self.game_window.blit(FLAG_FINISH, (470, 225))
 
+            mouse_pos = pygame.mouse.get_pos()
             back_button = create_button(
                 position=(400, 600),
                 text='BACK',
@@ -427,8 +427,6 @@ class Game:
                     self.end_game()
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    #     print(mouse_pos)
-
                     if back_button.check_for_input(mouse_pos):
                         self.end_game()
 

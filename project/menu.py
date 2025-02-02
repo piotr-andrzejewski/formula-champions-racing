@@ -1,14 +1,19 @@
 # menus
 
+import random
 import sys
 
-import pygame.constants
+import pygame
 from pygame import Surface
 
 from game import Game
-from images import *
-from settings import *
-from utils import *
+from images import CAR_1, CAR_2, CAR_3, CAR_4, CAR_5, CAR_6, CAR_7, CAR_8, CAR_1_BIG, CAR_2_BIG, CAR_3_BIG, \
+    CAR_4_BIG, CAR_5_BIG, CAR_6_BIG, CAR_7_BIG, CAR_8_BIG, CUP, TRACK_1, TRACK_2, TRACK_3, TRACK_1_TILE, \
+    TRACK_2_TILE, TRACK_3_TILE
+from settings import CAR_NAMES, CARS, LAPS, OPPONENTS, OPPONENTS_LEVEL, PENALTIES, STARTING_POSITIONS, TRACKS, \
+    TRACK_NAMES, Settings
+from utils import GAME_INFO_FONT_SIZE, MAIN_FONT_SIZE, SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, TITLE_FONT_SIZE, \
+    blit_screen, create_button, create_text, read_highscores_file, scale_image, Button
 
 # instantiate Settings class
 settings = Settings()
@@ -126,7 +131,7 @@ class Menu:
                 if event.type == pygame.QUIT:
                     self.quit_game()
 
-                if event.type == pygame.KEYDOWN and event.key == pygame.constants.K_ESCAPE:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     self.back_to_main_menu()
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -141,13 +146,12 @@ class Menu:
 
         while self.set_options:
             self.game_window.fill('black')
-            mouse_pos = pygame.mouse.get_pos()
-            # print(mouse_pos)
             self.create_header(font_size=MAIN_FONT_SIZE, text='SETTINGS', position=(400, 100))
             self.create_settings_items()
 
             buttons = self.create_settings_buttons()
             buttons['back'] = self.create_back_button()
+            mouse_pos = pygame.mouse.get_pos()
 
             for button in buttons.values():
                 button.change_color(mouse_pos)

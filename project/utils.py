@@ -2,10 +2,8 @@
 
 import csv
 import os
-from typing import TextIO
 
 import pygame
-
 from pygame import Surface
 
 pygame.font.init()
