@@ -6,7 +6,7 @@ import pygame.constants
 from pygame import Surface
 
 from game import Game
-from images import CUP
+from images import *
 from settings import *
 from utils import *
 
@@ -112,7 +112,7 @@ class Menu:
             self.game_window.fill('black')
             mouse_pos = pygame.mouse.get_pos()
 
-            self.create_header(font_size=MAIN_FONT_SIZE, text='HIGHSCORES', position=(400, 100))
+            self.create_header(font_size=MAIN_FONT_SIZE, text='HIGHSCORES', position=(400, 75))
             self.create_highscores_labels()
 
             for i in range(len(highscores)):
@@ -278,7 +278,7 @@ class Menu:
 
     def create_highscores_labels(self) -> None:
         left_pos = 40
-        top_pos = 200
+        top_pos = 150
         interval = 100
 
         create_text(
@@ -326,7 +326,7 @@ class Menu:
 
     def create_highscores_row(self, data: list[int | str], row_number: int) -> None:
         left_pos = 40
-        top_pos = 200 + 50 * row_number
+        top_pos = 150 + 60 * row_number
         interval = 100
 
         create_text(
@@ -347,18 +347,8 @@ class Menu:
             str(data[2]),
             position=(left_pos + interval * 2 + 30, top_pos),
         )
-        create_text(
-            self.game_window,
-            SELECTION_FONT_SIZE,
-            str(data[3]),
-            position=(left_pos + interval * 3 + 50, top_pos)
-        )
-        create_text(
-            self.game_window,
-            SELECTION_FONT_SIZE,
-            str(data[4]),
-            position=(left_pos + interval * 4 + 60, top_pos)
-        )
+        self.display_car(pos=(left_pos + interval * 3 + 50 - 22, top_pos - 9), car_name=str(data[3]))
+        self.display_track(pos=(left_pos + interval * 4 + 60 - 36, top_pos - 28), track_name=str(data[4]))
         create_text(
             self.game_window,
             SELECTION_FONT_SIZE,
@@ -398,7 +388,7 @@ class Menu:
             position=(left_pos, top_pos + interval),
             positioning='midright'
         )
-        self.game_window.blit(pygame.transform.rotate(scale_image(settings.selected_car, 2), 90), (585, 295))
+        self.display_car(pos=(580, 290))
         create_text(
             self.game_window,
             SELECTION_FONT_SIZE,
@@ -406,7 +396,7 @@ class Menu:
             position=(left_pos, top_pos + interval * 2),
             positioning='midright'
         )
-        self.game_window.blit(scale_image(settings.selected_track, 0.08), (565, 320))
+        self.display_track(pos=(565, 320))
         create_text(
             self.game_window,
             SELECTION_FONT_SIZE,
@@ -472,6 +462,58 @@ class Menu:
             str(settings.penalties),
             position=(right_pos, top_pos + interval * 7)
         )
+
+    def display_car(self, pos: tuple[int, int], car_name: str = '') -> None:
+        if car_name == '':
+            if settings.selected_car == CAR_1:
+                self.game_window.blit(pygame.transform.rotate(CAR_1_BIG, 90), pos)
+            elif settings.selected_car == CAR_2:
+                self.game_window.blit(pygame.transform.rotate(CAR_2_BIG, 90), pos)
+            elif settings.selected_car == CAR_3:
+                self.game_window.blit(pygame.transform.rotate(CAR_3_BIG, 90), pos)
+            elif settings.selected_car == CAR_4:
+                self.game_window.blit(pygame.transform.rotate(CAR_4_BIG, 90), pos)
+            elif settings.selected_car == CAR_5:
+                self.game_window.blit(pygame.transform.rotate(CAR_5_BIG, 90), pos)
+            elif settings.selected_car == CAR_6:
+                self.game_window.blit(pygame.transform.rotate(CAR_6_BIG, 90), pos)
+            elif settings.selected_car == CAR_7:
+                self.game_window.blit(pygame.transform.rotate(CAR_7_BIG, 90), pos)
+            elif settings.selected_car == CAR_8:
+                self.game_window.blit(pygame.transform.rotate(CAR_8_BIG, 90), pos)
+        else:
+            if car_name == 'CAR 1':
+                self.game_window.blit(pygame.transform.rotate(CAR_1_BIG, 90), pos)
+            elif car_name == 'CAR 2':
+                    self.game_window.blit(pygame.transform.rotate(CAR_2_BIG, 90), pos)
+            elif car_name == 'CAR 3':
+                self.game_window.blit(pygame.transform.rotate(CAR_3_BIG, 90), pos)
+            elif car_name == 'CAR 4':
+                self.game_window.blit(pygame.transform.rotate(CAR_4_BIG, 90), pos)
+            elif car_name == 'CAR 5':
+                self.game_window.blit(pygame.transform.rotate(CAR_5_BIG, 90), pos)
+            elif car_name == 'CAR 6':
+                self.game_window.blit(pygame.transform.rotate(CAR_6_BIG, 90), pos)
+            elif car_name == 'CAR 7':
+                self.game_window.blit(pygame.transform.rotate(CAR_7_BIG, 90), pos)
+            elif car_name == 'CAR 8':
+                self.game_window.blit(pygame.transform.rotate(CAR_8_BIG, 90), pos)
+
+    def display_track(self, pos: tuple[int, int], track_name: str = '') -> None:
+        if track_name == '':
+            if settings.selected_track == TRACK_1:
+                self.game_window.blit(TRACK_1_TILE, pos)
+            elif settings.selected_track == TRACK_2:
+                self.game_window.blit(TRACK_2_TILE, pos)
+            elif settings.selected_track == TRACK_3:
+                self.game_window.blit(TRACK_3_TILE, pos)
+        else:
+            if track_name == 'TRACK 1':
+                self.game_window.blit(TRACK_1_TILE, pos)
+            elif track_name == 'TRACK 2':
+                self.game_window.blit(TRACK_2_TILE, pos)
+            elif track_name == 'TRACK 3':
+                self.game_window.blit(TRACK_3_TILE, pos)
 
     @staticmethod
     def create_main_menu_buttons() -> dict[str, Button]:
