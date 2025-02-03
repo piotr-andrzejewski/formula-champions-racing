@@ -1,17 +1,18 @@
 # load images for the game
 
 import pygame.image
+import pygame.transform
 
 from utils import scale_image
 
 TRACK_1 = scale_image(pygame.image.load('./assets/track1.png'), 1.2)
 TRACK_1_LIMITS = scale_image(pygame.image.load('./assets/track1_limits.png'), 1.2)
 TRACK_1_TILE = pygame.image.load('./assets/track1_tile.png')
-TRACK_2 = pygame.image.load('./assets/track2.png')
-TRACK_2_LIMITS = pygame.image.load('./assets/track2_limits.png')
+TRACK_2 = scale_image(pygame.image.load('./assets/track2.png'), 1.2)
+TRACK_2_LIMITS = scale_image(pygame.image.load('./assets/track2_limits.png'), 1.2)
 TRACK_2_TILE = pygame.image.load('./assets/track2_tile.png')
-TRACK_3 = pygame.image.load('./assets/track3.png')
-TRACK_3_LIMITS = pygame.image.load('./assets/track3_limits.png')
+TRACK_3 = pygame.transform.rotate(scale_image(pygame.image.load('./assets/track3.png'), 1.2), -15)
+TRACK_3_LIMITS = pygame.transform.rotate(scale_image(pygame.image.load('./assets/track3_limits.png'), 1.2), -15)
 TRACK_3_TILE = pygame.image.load('./assets/track3_tile.png')
 
 CAR_1 = pygame.image.load('./assets/car1.png')

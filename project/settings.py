@@ -70,11 +70,11 @@ class Settings:
             starting_position = self.get_random_starting_position()
             self.starting_position = starting_position
 
-        self.occupied_starting_positions.append(self.starting_position)
+        self.occupied_starting_positions = [self.starting_position]
 
         return TRACK_POSITIONS[self.create_track_position_name(self.selected_track_name, self.starting_position)]
 
-    def get_opponent_starting_track_position(self) -> tuple[int, int]:
+    def get_opponent_starting_track_position(self) -> tuple[float, float]:
         opponent_starting_position = self.get_opponent_starting_position(self.occupied_starting_positions)
         self.occupied_starting_positions.append(opponent_starting_position)
 

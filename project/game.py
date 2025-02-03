@@ -22,10 +22,10 @@ from utils import GAME_INFO_FONT_SIZE, SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE,
 # constants for the game
 TRACK_1_POSITION = (-140, -20)
 TRACK_1_FINISH_LINE_POSITION = (535, 733)
-TRACK_2_POSITION = (10, 10)
-TRACK_2_FINISH_LINE_POSITION = (535, 762)
-TRACK_3_POSITION = (10, 10)
-TRACK_3_FINISH_LINE_POSITION = (535, 762)
+TRACK_2_POSITION = (-45, -50)
+TRACK_2_FINISH_LINE_POSITION = (755, 583)
+TRACK_3_POSITION = (-140, -80)
+TRACK_3_FINISH_LINE_POSITION = (400, 233)
 
 # set frames per second parameter
 FPS = 60
@@ -91,7 +91,8 @@ class Game:
             opponents[i] = ComputerCar(
                 img=computer_car,
                 level=self.settings.opponents_level,
-                start_pos=self.settings.get_opponent_starting_track_position()
+                start_pos=self.settings.get_opponent_starting_track_position(),
+                track_name=self.settings.selected_track_name
             )
             occupied_cars.append(computer_car)
 
@@ -153,12 +154,7 @@ class Game:
         self.game_start_time = current_time
         self.player.lap_start_time = current_time
 
-    def end_game(self, index: int = 0) -> None:
-
-        # code to display computer car's path in console to be able to copy it for PATH variable
-        if self.opponents:
-            print(self.opponents[index].path)
-
+    def end_game(self) -> None:
         self.reset()
 
     def get_lap_time(self) -> int:
@@ -185,18 +181,6 @@ class Game:
                     # display player position to better tune computer car's path
                     print((self.player.x_pos, self.player.y_pos))
 
-
-                if self.opponents:
-                    # select index of computer car for which you want to create path
-                    i = 0
-
-                    if pressed_keys[pygame.constants.K_z]:
-                        self.opponents[i].path.append((self.player.x_pos, self.player.y_pos))
-
-                    # code to delete last path point
-                    if pressed_keys[pygame.constants.K_c]:
-                        self.opponents[i].path.pop()
-
     def run(self) -> None:
         self.start_game()
 
@@ -208,7 +192,6 @@ class Game:
 
             self.draw()
             self.move_player()
-            self.generate_path_for_computer_car()
             self.determine_track_specific_conditions()
 
             if self.player.out_of_track:
@@ -234,6 +217,8 @@ class Game:
         self.draw_track(self.settings.selected_track_name)
         self.display_info()
 
+        mouse_pos = pygame.mouse.get_pos()
+
         for event in pygame.event.get():
             if event.type == pygame.constants.QUIT:
                 self.end_game()
@@ -241,6 +226,29 @@ class Game:
 
             if event.type == pygame.constants.KEYDOWN and event.key == pygame.constants.K_ESCAPE:
                 self.end_game()
+
+            # next three if statements are dedicated to generating path for computer car to follow
+            if event.type == pygame.constants.MOUSEBUTTONDOWN:
+                print(mouse_pos)
+
+            # code to generate points for computer car path
+            if event.type == pygame.constants.KEYDOWN and event.key == pygame.constants.K_x:
+
+                # display player position to better tune computer car's path
+                print((self.player.x_pos, self.player.y_pos))
+
+            # manipulating path when there is at least one opponent active
+            if self.opponents:
+
+                # select index of computer car for which you want to create path
+                i = 0
+
+                if event.type == pygame.constants.KEYDOWN and event.key == pygame.constants.K_z:
+                    self.opponents[i].path.append((self.player.x_pos, self.player.y_pos))
+
+                # code to delete last path point
+                if event.type == pygame.constants.KEYDOWN and event.key == pygame.constants.K_c:
+                    self.opponents[i].path.pop()
 
         if self.player.out_of_track:
             self.display_back_to_track_text()
@@ -306,7 +314,7 @@ class Game:
             self.handle_finish_line_crossing(TRACK_2_FINISH_LINE_POSITION)
         elif self.settings.selected_track_name == 'TRACK 3':
             self.handle_out_of_track(TRACK_3_LIMITS_MASK, TRACK_3_POSITION)
-            self.handle_finish_line_crossing(TRACK_3_FINISH_LINE_POSITION)
+            self.handle_finish_line_crossing(TRACK_3_FINISH_LINE_POSITION, inverse=True)
 
     def handle_out_of_track(self, track_limits_mask: MaskType, track_limits_pos: tuple[int, int]) -> None:
         if self.player.collide(track_limits_mask, *track_limits_pos) is None:
@@ -321,36 +329,52 @@ class Game:
             self.start_time_out_of_track = 0.0
             self.time_out_of_track = 0.0
 
-    def handle_finish_line_crossing(self, track_finish_line_pos: tuple[int, int]) -> None:
+    def handle_finish_line_crossing(self, track_finish_line_pos: tuple[int, int], inverse: bool = False) -> None:
+        time_interval = 10
+
         for key, opponent in self.opponents.items():
             opponent_finish_line_poi = opponent.collide(FINISH_LINE_MASK, *track_finish_line_pos)
 
-            if opponent_finish_line_poi is not None:
-                opponent.crossed_line = True
-                opponent.current_point = 0
+            if inverse:
+                if opponent_finish_line_poi is not None:
+                    opponent.crossed_start_line = True
+            else:
+                opponent.crossed_start_line = True
 
-            if opponent_finish_line_poi is None:
-                if opponent.crossed_line:
-                    opponent.completed_laps += 1
-                    opponent.crossed_line = False
+            if opponent.crossed_start_line and self.get_game_total_time() > time_interval:
+                if opponent_finish_line_poi is not None:
+                    opponent.crossed_finish_line = True
+                    opponent.current_point = 0
+
+                if opponent_finish_line_poi is None:
+                    if opponent.crossed_finish_line:
+                        opponent.completed_laps += 1
+                        opponent.crossed_finish_line = False
 
         player_finish_line_poi = self.player.collide(FINISH_LINE_MASK, *track_finish_line_pos)
 
-        if player_finish_line_poi is not None:
-            if player_finish_line_poi[0] > 0:
-                self.player.crossed_line = True
+        if inverse:
+            if player_finish_line_poi is not None:
+                self.player.crossed_start_line = True
+        else:
+            self.player.crossed_start_line = True
 
-            if not self.player.crossed_line:
-                self.display_wrong_way_text()
-                self.player.reset_position()
+        if self.player.crossed_start_line:
+            if player_finish_line_poi is not None:
+                if player_finish_line_poi[0] > 0 and self.get_game_total_time() > time_interval:
+                    self.player.crossed_finish_line = True
 
-        if player_finish_line_poi is None:
-            if self.player.crossed_line:
-                current_time = round(time.time(), 3)
-                self.player.completed_laps += 1
-                self.player.lap_times.append(round(current_time - self.player.lap_start_time, 3))
-                self.player.lap_start_time = current_time
-                self.player.crossed_line = False
+                if not self.player.crossed_finish_line and self.get_game_total_time() > time_interval / 2:
+                    self.display_wrong_way_text()
+                    self.player.reset_position(self.settings.selected_track_name)
+
+            if player_finish_line_poi is None:
+                if self.player.crossed_finish_line:
+                    current_time = round(time.time(), 3)
+                    self.player.completed_laps += 1
+                    self.player.lap_times.append(round(current_time - self.player.lap_start_time, 3))
+                    self.player.lap_start_time = current_time
+                    self.player.crossed_finish_line = False
 
     def get_best_lap(self) -> float | None:
         self.player.find_best_lap()
@@ -360,11 +384,11 @@ class Game:
 
     def calculate_score(self) -> None:
         if self.settings.selected_track_name == 'TRACK 3':
-            track_factor = 0.9
+            track_factor = 1.0
         elif self.settings.selected_track_name == 'TRACK 2':
-            track_factor = 0.8
+            track_factor = 0.96
         else:
-            track_factor = 1
+            track_factor = 0.98
 
         if self.settings.opponents_level == 1:
             opponents_level_factor = 0.6
@@ -373,7 +397,7 @@ class Game:
         else:
             opponents_level_factor = 1
 
-        if self.settings.selected_starting_position < 5:
+        if self.settings.starting_position < 5:
             starting_position_factor = 0.8
         else:
             starting_position_factor = 1
@@ -399,9 +423,9 @@ class Game:
 
         for i in range(1, len(LAPS)):
             if self.settings.selected_laps == i:
-                if self.game_total_time <= 35.0 * i:
+                if self.game_total_time <= 45.0 * i:
                     total_time_factor = 1
-                elif self.game_total_time <= 50.0 * i:
+                elif self.game_total_time <= 60.0 * i:
                     total_time_factor = 0.75
                 else:
                     total_time_factor = 0.5
