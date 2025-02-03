@@ -17,7 +17,7 @@ from images import CAR_1, CAR_2, CAR_3, CAR_4, CAR_5, CAR_6, CAR_7, CAR_8, CAR_1
 from settings import CAR_NAMES, CARS, LAPS, OPPONENTS, OPPONENTS_LEVEL, PENALTIES, STARTING_POSITIONS, TRACKS, \
     TRACK_NAMES, Settings
 from utils import GAME_INFO_FONT_SIZE, MAIN_FONT_SIZE, SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, TITLE_FONT_SIZE, \
-    blit_screen, create_button, create_text, read_highscores_file, scale_image, Button
+    blit_screen, create_button, create_text, read_scores_file, scale_image, Button
 
 # instantiate Settings class
 settings = Settings()
@@ -115,8 +115,11 @@ class Menu:
     def highscores_menu(self) -> None:
         self.show_highscores = True
         self.display_main_menu = False
-        filename = 'highscores.csv'
-        highscores = read_highscores_file(filename)
+        filename = 'scores.csv'
+
+        # get only 8 best scores
+        highscores = read_scores_file(filename, 8)
+
 
         while self.show_highscores:
             self.game_window.fill('black')

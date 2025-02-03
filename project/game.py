@@ -17,7 +17,7 @@ from images import FINISH_LINE, FLAG_FINISH, FLAG_PENALTY, LIGHTS, TRACK_1, TRAC
     TRACK_2_LIMITS, TRACK_3_LIMITS
 from settings import Settings
 from utils import GAME_INFO_FONT_SIZE, SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, \
-    blit_screen, create_button, create_text, read_highscores_file, update_highscores_file
+    blit_screen, create_button, create_text, read_scores_file, update_scores_file
 
 # constants for the game
 TRACK_1_POSITION = (-40, -20)
@@ -713,38 +713,37 @@ class Game:
         )
 
     def save_score(self) -> None:
-        filename = 'highscores.csv'
-        highscores = read_highscores_file(filename)
-        size = len(highscores)
+        filename = 'scores.csv'
+        scores = read_scores_file(filename)
+        size = len(scores)
 
         if not size:
-            highscores.append(self.create_score_data(1))
-            update_highscores_file(filename, highscores)
+            scores.append(self.create_score_data(1))
+            update_scores_file(filename, scores)
 
             return
 
         score_inserted = False
 
+        # check if current score is bigger than others
+        # if so add it at the right index
+        # and update indexes for lower scores
         for i in range(size):
-            if self.player.score > highscores[i][1]:
-                highscores.insert(i, self.create_score_data(i + 1))
+            if self.player.score > scores[i][1]:
+                scores.insert(i, self.create_score_data(i + 1))
                 score_inserted = True
 
                 for j in range(i + 1, size + 1):
-                    highscores[j][0] += 1
-
-                if len(highscores) > 8:
-                    highscores.pop()
-
+                    scores[j][0] += 1
                 break
 
-        if not score_inserted and size < 8:
-            highscores.append(self.create_score_data(size + 1))
-
+        # if current score is lower than any other insert it at the end
+        if not score_inserted:
+            scores.append(self.create_score_data(size + 1))
             score_inserted = True
 
         if score_inserted:
-            update_highscores_file(filename, highscores)
+            update_scores_file(filename, scores)
 
     def create_score_data(self, place: int) ->  list[int | str]:
         return [

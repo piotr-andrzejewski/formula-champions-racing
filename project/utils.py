@@ -137,10 +137,11 @@ def file_open_scope(filename: str) -> str:
     return 'r+'
 
 
-def read_highscores_file(filename: str) ->  list[list[int | str]]:
+def read_scores_file(filename: str, limit: int = 0) ->  list[list[int | str]]:
     with open(filename, file_open_scope(filename), encoding='utf-8', newline='') as file:
         reader = csv.reader(file)
-        highscores = []
+        scores = []
+        counter = 0
 
         for row in reader:
             row_place = int(row[0])
@@ -150,7 +151,7 @@ def read_highscores_file(filename: str) ->  list[list[int | str]]:
             row_track_name = row[4]
             row_best_lap = row[5]
             row_penalties = row[6]
-            highscores.append([
+            scores.append([
                 row_place,
                 row_score,
                 row_nickname,
@@ -159,11 +160,15 @@ def read_highscores_file(filename: str) ->  list[list[int | str]]:
                 row_best_lap,
                 row_penalties
             ])
+            counter += 1
 
-    return highscores
+            if counter == limit:
+                break
+
+    return scores
 
 
-def update_highscores_file(filename: str, data: list[list[int | str]]) -> None:
+def update_scores_file(filename: str, data: list[list[int | str]]) -> None:
         with open(filename, file_open_scope(filename), encoding='utf-8', newline='') as file:
             file.truncate(0)
             file.seek(0)
