@@ -166,21 +166,6 @@ class Game:
 
         return current_time
 
-    def generate_path_for_computer_car(self) -> None:
-        pressed_keys = pygame.key.get_pressed()
-        mouse_pos = pygame.mouse.get_pos()
-
-        for event in pygame.event.get():
-            if event.type == pygame.constants.MOUSEBUTTONDOWN:
-                print(mouse_pos)
-
-            # code to generate points for computer car path
-            if event.type == pygame.constants.KEYDOWN:
-                if pressed_keys[pygame.constants.K_x]:
-
-                    # display player position to better tune computer car's path
-                    print((self.player.x_pos, self.player.y_pos))
-
     def run(self) -> None:
         self.start_game()
 
@@ -217,8 +202,6 @@ class Game:
         self.draw_track(self.settings.selected_track_name)
         self.display_info()
 
-        mouse_pos = pygame.mouse.get_pos()
-
         for event in pygame.event.get():
             if event.type == pygame.constants.QUIT:
                 self.end_game()
@@ -226,29 +209,6 @@ class Game:
 
             if event.type == pygame.constants.KEYDOWN and event.key == pygame.constants.K_ESCAPE:
                 self.end_game()
-
-            # next three if statements are dedicated to generating path for computer car to follow
-            if event.type == pygame.constants.MOUSEBUTTONDOWN:
-                print(mouse_pos)
-
-            # code to generate points for computer car path
-            if event.type == pygame.constants.KEYDOWN and event.key == pygame.constants.K_x:
-
-                # display player position to better tune computer car's path
-                print((self.player.x_pos, self.player.y_pos))
-
-            # manipulating path when there is at least one opponent active
-            if self.opponents:
-
-                # select index of computer car for which you want to create path
-                i = 0
-
-                if event.type == pygame.constants.KEYDOWN and event.key == pygame.constants.K_z:
-                    self.opponents[i].path.append((self.player.x_pos, self.player.y_pos))
-
-                # code to delete last path point
-                if event.type == pygame.constants.KEYDOWN and event.key == pygame.constants.K_c:
-                    self.opponents[i].path.pop()
 
         if self.player.out_of_track:
             self.display_back_to_track_text()

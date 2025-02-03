@@ -9,7 +9,7 @@ from pygame.mask import Mask
 from pygame.surface import Surface
 
 from images import CAR_1, CAR_2, CAR_3, CAR_4, CAR_5, CAR_6, CAR_7, CAR_8
-from utils import blit_rotate_center, draw_points
+from utils import blit_rotate_center
 
 # constants
 TRACK_POSITIONS = {
@@ -359,6 +359,3 @@ class ComputerCar(BaseCar):
     def draw(self, window: Surface) -> None:
         self.update_path_point(self.smooth_path())
         super().draw(window)
-
-        # function to draw path points
-        draw_points(self.path, window)
