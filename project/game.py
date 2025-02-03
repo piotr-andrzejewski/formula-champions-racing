@@ -355,44 +355,42 @@ class Game:
         elif self.settings.opponents_level == 2:
             opponents_level_factor = 0.8
         else:
-            opponents_level_factor = 1
+            opponents_level_factor = 1.0
 
         if self.settings.starting_position < 5:
             starting_position_factor = 0.8
         else:
-            starting_position_factor = 1
+            starting_position_factor = 1.0
 
-        if self.player.final_position == 1:
-            final_position_factor = 1
-        elif self.player.final_position == 2:
-            final_position_factor = 0.9
-        elif self.player.final_position == 3:
-            final_position_factor = 0.8
-        elif self.player.final_position == 4:
-            final_position_factor = 0.7
-        elif self.player.final_position == 5:
-            final_position_factor = 0.6
-        elif self.player.final_position == 6:
-            final_position_factor = 0.5
-        elif self.player.final_position == 7:
-            final_position_factor = 0.4
+        if self.settings.opponents > 0:
+            if self.player.final_position == 1:
+                final_position_factor = 1.0
+            elif self.player.final_position == 2:
+                final_position_factor = 0.9
+            elif self.player.final_position == 3:
+                final_position_factor = 0.8
+            elif self.player.final_position == 4:
+                final_position_factor = 0.7
+            elif self.player.final_position == 5:
+                final_position_factor = 0.6
+            elif self.player.final_position == 6:
+                final_position_factor = 0.5
+            elif self.player.final_position == 7:
+                final_position_factor = 0.4
+            else:
+                final_position_factor = 0.3
         else:
-            final_position_factor = 0.3
+            final_position_factor = 0.5
 
-        total_time_factor = 0.5
-
-        for i in range(1, len(LAPS)):
-            if self.settings.selected_laps == i:
-                if self.game_total_time <= 45.0 * i:
-                    total_time_factor = 1
-                elif self.game_total_time <= 60.0 * i:
-                    total_time_factor = 0.75
-                else:
-                    total_time_factor = 0.5
-                break
+        if self.game_total_time <= 45.0 * self.settings.selected_laps:
+            total_time_factor = 1
+        elif self.game_total_time <= 60.0 * self.settings.selected_laps:
+            total_time_factor = 0.75
+        else:
+            total_time_factor = 0.5
 
         if self.settings.penalties == 'ON':
-            penalties_factor = 1
+            penalties_factor = 1.0
         else:
             penalties_factor = 0.5
 
@@ -401,6 +399,7 @@ class Game:
         self.player.score = round(
                 1000
                 * 60
+                * 4
                 * track_factor
                 * opponents_level_factor
                 * starting_position_factor
@@ -410,6 +409,7 @@ class Game:
                 * self.settings.selected_laps
                 / car_factor
                 / self.game_total_time
+                / 3
         )
 
     def show_results(self) -> None:
