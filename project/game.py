@@ -15,7 +15,7 @@ from pygame.mask import MaskType
 from cars import COLLISION_POINTS, calculate_vel_factor, PlayerCar, ComputerCar
 from images import FINISH_LINE, FLAG_FINISH, FLAG_PENALTY, LIGHTS, TRACK_1, TRACK_2, TRACK_3, TRACK_1_LIMITS, \
     TRACK_2_LIMITS, TRACK_3_LIMITS
-from settings import LAPS, Settings
+from settings import Settings
 from utils import GAME_INFO_FONT_SIZE, SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, \
     blit_screen, create_button, create_text, read_highscores_file, update_highscores_file
 
@@ -178,6 +178,7 @@ class Game:
             self.draw()
             self.move_player()
             self.determine_track_specific_conditions()
+            self.handle_out_of_screen()
 
             if self.player.out_of_track:
                 self.determine_penalty(self.settings.selected_track_name, self.time_out_of_track)
@@ -213,12 +214,20 @@ class Game:
         if self.player.out_of_track:
             self.display_back_to_track_text()
 
+        if self.player.out_of_screen:
+            self.player.reset_position(self.settings.selected_track_name)
+            self.display_out_of_screen_text()
+
         self.player.draw(self.game_window)
 
         for key, opponent in self.opponents.items():
             opponent.draw(self.game_window)
 
         pygame.display.update()
+
+        if self.player.out_of_screen:
+            time.sleep(1)
+            self.player.out_of_screen = False
 
     def draw_track(self, track_name: str) -> None:
         if track_name == 'TRACK 1':
@@ -275,6 +284,15 @@ class Game:
         elif self.settings.selected_track_name == 'TRACK 3':
             self.handle_out_of_track(TRACK_3_LIMITS_MASK, TRACK_3_POSITION)
             self.handle_finish_line_crossing(TRACK_3_FINISH_LINE_POSITION, inverse=True)
+
+    def handle_out_of_screen(self) -> None:
+        if (self.player.x_pos < 0
+                or self.player.x_pos > self.game_window.get_width()
+                or self.player.y_pos < 0
+                or self.player.y_pos > self.game_window.get_height()
+        ):
+            self.player.out_of_screen = True
+            self.player.out_of_track = False
 
     def handle_out_of_track(self, track_limits_mask: MaskType, track_limits_pos: tuple[int, int]) -> None:
         if self.player.collide(track_limits_mask, *track_limits_pos) is None:
@@ -556,6 +574,15 @@ class Game:
             self.game_window,
             SECONDARY_FONT_SIZE,
             'GET BACK TO TRACK',
+            color='#b68f40',
+            position=(self.game_window.get_width() / 2, self.game_window.get_height() / 2)
+        )
+
+    def display_out_of_screen_text(self) -> None:
+        create_text(
+            self.game_window,
+            SECONDARY_FONT_SIZE,
+            'OUT OF SCREEN',
             color='#b68f40',
             position=(self.game_window.get_width() / 2, self.game_window.get_height() / 2)
         )

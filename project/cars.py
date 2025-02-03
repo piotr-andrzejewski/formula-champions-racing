@@ -240,6 +240,7 @@ class PlayerCar(BaseCar):
         self.lap_times = None
         self.best_lap = None
         self.out_of_track = False
+        self.out_of_screen = False
 
         if self.lap_times is None:
             self.lap_times = []
@@ -251,6 +252,7 @@ class PlayerCar(BaseCar):
         self.lap_times = []
         self.best_lap = None
         self.out_of_track = False
+        self.out_of_screen = False
         super().reset()
 
     def brake(self) -> None:
