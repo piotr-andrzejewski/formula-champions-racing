@@ -3,8 +3,12 @@
 import random
 import sys
 
-import pygame
-from pygame import Surface
+import pygame.constants
+import pygame.display
+import pygame.event
+import pygame.mouse
+import pygame.transform
+from pygame.surface import Surface
 
 from game import Game
 from images import CAR_1, CAR_2, CAR_3, CAR_4, CAR_5, CAR_6, CAR_7, CAR_8, CAR_1_BIG, CAR_2_BIG, CAR_3_BIG, \
@@ -55,14 +59,14 @@ class Menu:
                 button.update(self.game_window)
 
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.constants.QUIT:
                     self.quit_game()
 
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
+                if event.type == pygame.constants.KEYDOWN:
+                    if event.key == pygame.constants.K_ESCAPE:
                         self.quit_game()
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.type == pygame.constants.MOUSEBUTTONDOWN:
                     if buttons['play'].check_for_input(mouse_pos):
                         blit_screen(self.game_window)
                         self.run_game()
@@ -128,13 +132,13 @@ class Menu:
             back_button.update(self.game_window)
 
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.constants.QUIT:
                     self.quit_game()
 
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                if event.type == pygame.constants.KEYDOWN and event.key == pygame.constants.K_ESCAPE:
                     self.back_to_main_menu()
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.type == pygame.constants.MOUSEBUTTONDOWN:
                     if back_button.check_for_input(mouse_pos):
                         self.back_to_main_menu()
 
@@ -158,16 +162,16 @@ class Menu:
                 button.update(self.game_window)
 
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.constants.QUIT:
                     self.quit_game()
 
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.constants.KEYDOWN:
 
-                    if event.key == pygame.K_ESCAPE:
+                    if event.key == pygame.constants.K_ESCAPE:
                         self.back_to_main_menu()
 
                     # check for backspace
-                    if event.key == pygame.K_BACKSPACE:
+                    if event.key == pygame.constants.K_BACKSPACE:
 
                         # get text input from 0 to -1 i.e. end.
                         settings.player_nickname = settings.player_nickname[:-1]
@@ -177,7 +181,7 @@ class Menu:
                         if len(settings.player_nickname) < 10:
                             settings.player_nickname += event.unicode
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.type == pygame.constants.MOUSEBUTTONDOWN:
                     if buttons['select_car_previous'].check_for_input(mouse_pos):
                         index_of_current_car = CARS.index(settings.selected_car)
 
@@ -641,7 +645,7 @@ class Menu:
 
     @staticmethod
     def quit_game() -> None:
-        pygame.quit()
+        pygame.display.quit()
         sys.exit()
 
     @staticmethod

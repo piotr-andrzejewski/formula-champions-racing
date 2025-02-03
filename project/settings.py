@@ -2,7 +2,7 @@
 
 import random
 
-from pygame import Surface
+from pygame.surface import Surface
 
 from cars import TRACK_POSITIONS
 from images import CAR_1, CAR_2, CAR_3, CAR_4, CAR_5, CAR_6, CAR_7, CAR_8, TRACK_1, TRACK_2, TRACK_3
@@ -74,7 +74,7 @@ class Settings:
 
         return TRACK_POSITIONS[self.create_track_position_name(self.selected_track_name, self.starting_position)]
 
-    def get_opponent_starting_track_position(self) -> tuple[float, float]:
+    def get_opponent_starting_track_position(self) -> tuple[int, int]:
         opponent_starting_position = self.get_opponent_starting_position(self.occupied_starting_positions)
         self.occupied_starting_positions.append(opponent_starting_position)
 
@@ -112,7 +112,7 @@ class Settings:
 
     @staticmethod
     def create_track_position_name(track_name: str, position: int) -> str:
-        track_position_name = track_name.replace(' ', '_') + '_' + str(position)
+        track_position_name = track_name + ' P' + str(position)
 
         return track_position_name
 

@@ -3,8 +3,12 @@
 import csv
 import os
 
-import pygame
-from pygame import Surface
+import pygame.display
+import pygame.draw
+import pygame.font
+import pygame.image
+import pygame.transform
+from pygame.surface import Surface
 
 pygame.font.init()
 
@@ -173,3 +177,9 @@ def update_highscores_file(filename: str, data: list[list[int | str]]) -> None:
             file.seek(0)
             writer = csv.writer(file)
             writer.writerows(data)
+
+
+# helper function to draw points of computer car's path
+def draw_points(path: list[tuple[int, int]], window: Surface) -> None:
+    for point in path:
+        pygame.draw.circle(window, (255, 0, 0), point, 2)

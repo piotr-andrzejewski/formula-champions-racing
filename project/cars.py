@@ -1,38 +1,78 @@
 # definition of cars
 
-import pygame
 import math
 import numpy
 
+import pygame.transform
 from scipy.interpolate import CubicSpline
-from pygame import Mask, Surface
+from pygame.mask import Mask
+from pygame.surface import Surface
 
 from images import CAR_1, CAR_2, CAR_3, CAR_4, CAR_5, CAR_6, CAR_7, CAR_8
-from utils import blit_rotate_center
+from utils import blit_rotate_center, draw_points
 
 # constants
 TRACK_POSITIONS = {
-    'TRACK_1_1': (380.0, 772),
-    'TRACK_1_2': (400.0, 758.5),
-    'TRACK_1_3': (420.0, 772),
-    'TRACK_1_4': (440.0, 758.5),
-    'TRACK_1_5': (460.0, 772),
-    'TRACK_1_6': (480.0, 758.5),
-    'TRACK_1_7': (500.0, 772),
-    'TRACK_1_8': (520.0, 758.5),
+    'TRACK 1 P1': (380.0, 772),
+    'TRACK 1 P2': (400.0, 758.5),
+    'TRACK 1 P3': (420.0, 772),
+    'TRACK 1 P4': (440.0, 758.5),
+    'TRACK 1 P5': (460.0, 772),
+    'TRACK 1 P6': (480.0, 758.5),
+    'TRACK 1 P7': (500.0, 772),
+    'TRACK 1 P8': (520.0, 758.5),
+    'TRACK 2 P1': (380.0, 772),
+    'TRACK 2 P2': (400.0, 758.5),
+    'TRACK 2 P3': (420.0, 772),
+    'TRACK 2 P4': (440.0, 758.5),
+    'TRACK 2 P5': (460.0, 772),
+    'TRACK 2 P6': (480.0, 758.5),
+    'TRACK 2 P7': (500.0, 772),
+    'TRACK 2 P8': (520.0, 758.5),
+    'TRACK 3 P1': (380.0, 772),
+    'TRACK 3 P2': (400.0, 758.5),
+    'TRACK 3 P3': (420.0, 772),
+    'TRACK 3 P4': (440.0, 758.5),
+    'TRACK 3 P5': (460.0, 772),
+    'TRACK 3 P6': (480.0, 758.5),
+    'TRACK 3 P7': (500.0, 772),
+    'TRACK 3 P8': (520.0, 758.5),
 }
 RESET_POSITIONS = {
-    'TRACK_1': (528.5, 758.5)
+    'TRACK 1': (528.5, 758.5),
+    'TRACK 2': (528.5, 758.5),
+    'TRACK 3': (528.5, 758.5),
 }
 PATHS = {
-    'TRACK_1': [
-        (234.0, 774.0), (71.0, 773.0), (26.0, 744.0), (96.0, 686.0), (200.0, 670.0),
-        (332.0, 668.0), (377.0, 642.0), (363.0, 598.0), (286.0, 557.0), (241.0, 405.0),
-        (211.0, 250.0), (169.0, 168.0), (74.0, 98.0), (105.0, 30.0), (182.0, 16.0), (290.0, 32.0),
-        (328.0, 75.0), (416.0, 150.0), (492.0, 126.0), (554.0, 128.0), (598.0, 189.0),
-        (658.0, 251.0), (751.0, 290.0), (774.0, 366.0), (766.0, 526.0), (759.0, 597.0),
-        (730.0, 621.0), (650.0, 608.0), (582.0, 610.0), (550.0, 647.0), (622.0, 675.0),
-        (694.0, 672.0), (746.0, 705.0), (723.0, 767.0), (624.0, 778.0), (455.0, 773.0)
+    'TRACK 1': [
+        (234, 774), (71, 773), (26, 744), (96, 686), (200, 670),
+        (332, 668), (377, 642), (363, 598), (286, 557), (241, 405),
+        (211, 250), (169, 168), (74, 98), (105, 30), (182, 16),
+        (290, 32), (328, 75), (416, 150), (492, 126), (554, 128),
+        (598, 189), (658, 251), (751, 290), (774, 366), (766, 526),
+        (759, 597), (730, 621), (650, 608), (582, 610), (550, 647),
+        (622, 675), (694, 672), (746, 705), (723, 767), (624, 778),
+        (455, 773)
+    ],
+    'TRACK 2': [
+        (234, 774), (71, 773), (26, 744), (96, 686), (200, 670),
+        (332, 668), (377, 642), (363, 598), (286, 557), (241, 405),
+        (211, 250), (169, 168), (74, 98), (105, 30), (182, 16),
+        (290, 32), (328, 75), (416, 150), (492, 126), (554, 128),
+        (598, 189), (658, 251), (751, 290), (774, 366), (766, 526),
+        (759, 597), (730, 621), (650, 608), (582, 610), (550, 647),
+        (622, 675), (694, 672), (746, 705), (723, 767), (624, 778),
+        (455, 773)
+    ],
+    'TRACK 3': [
+        (234, 774), (71, 773), (26, 744), (96, 686), (200, 670),
+        (332, 668), (377, 642), (363, 598), (286, 557), (241, 405),
+        (211, 250), (169, 168), (74, 98), (105, 30), (182, 16),
+        (290, 32), (328, 75), (416, 150), (492, 126), (554, 128),
+        (598, 189), (658, 251), (751, 290), (774, 366), (766, 526),
+        (759, 597), (730, 621), (650, 608), (582, 610), (550, 647),
+        (622, 675), (694, 672), (746, 705), (723, 767), (624, 778),
+        (455, 773)
     ]
 }
 POINT_MARGIN = 20.0
@@ -40,12 +80,20 @@ COLLISION_POINTS = {
     'TRACK 1': [
         (70, 745), (350, 630), (110, 80), (520, 150),
         (735, 330), (725, 590), (595, 640), (700, 720)
+    ],
+    'TRACK 2': [
+        (70, 745), (350, 630), (110, 80), (520, 150),
+        (735, 330), (725, 590), (595, 640), (700, 720)
+    ],
+    'TRACK 3': [
+        (70, 745), (350, 630), (110, 80), (520, 150),
+        (735, 330), (725, 590), (595, 640), (700, 720)
     ]
 }
 
 class BaseCar:
     IMG = CAR_1
-    START_POS = TRACK_POSITIONS['TRACK_1_1']
+    START_POS = TRACK_POSITIONS['TRACK 1 P1']
     MAX_VEL = 3.0
 
     def __init__(self) -> None:
@@ -155,7 +203,7 @@ class PlayerCar(BaseCar):
         self.move()
 
     def reset_position(self) -> None:
-        self.x_pos, self.y_pos = RESET_POSITIONS['TRACK_1']
+        self.x_pos, self.y_pos = RESET_POSITIONS['TRACK 1']
         self.angle = 90.0
         self.vel = 0.0
 
@@ -163,6 +211,8 @@ class PlayerCar(BaseCar):
         for point in points:
             if math.hypot(point[0] - self.x_pos, point[1] - self.y_pos) < POINT_MARGIN:
                 return True
+
+        return False
 
     def find_best_lap(self) -> None:
         lap_times_length = len(self.lap_times)
@@ -184,11 +234,11 @@ class ComputerCar(BaseCar):
             self,
             img: Surface = BaseCar.IMG,
             level: int = LEVEL,
-            start_pos: tuple[float, float] = TRACK_POSITIONS['TRACK_1_2']
+            start_pos: tuple[int, int] = TRACK_POSITIONS['TRACK 1 P2']
     ) -> None:
         super().__init__()
 
-        self.path = PATHS['TRACK_1']
+        self.path = PATHS['TRACK 1']
         self.current_point = 0
         self.vel = (self.MAX_VEL - 0.7 + level / 5) * calculate_vel_factor(img)
         self.img = pygame.transform.rotate(img, -90)
@@ -230,7 +280,7 @@ class ComputerCar(BaseCar):
                 self.current_point += 1
 
     # function to interpolate path with cubic splines to make more smooth path to follow
-    def smooth_path(self) -> list[tuple[float, float]]:
+    def smooth_path(self) -> list[tuple[int, int]]:
 
         # extract x and y coordinates from points in path
         pos_x, pos_y = zip(*self.path)
@@ -246,10 +296,5 @@ class ComputerCar(BaseCar):
         self.update_path_point(self.smooth_path())
         super().draw(window)
 
-        # # use of helper function to display path points
-        # self.draw_points(window)
-
-    # helper function to draw points of computer car's path
-    # def draw_points(self, window: Surface) -> None:
-    #     for point in self.path:
-    #         pygame.draw.circle(window, (255, 0, 0), point, 2)
+        # function to draw path points
+        draw_points(self.path, window)

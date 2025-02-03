@@ -1,11 +1,11 @@
 # load images for the game
 
-import pygame
+import pygame.image
 
 from utils import scale_image
 
-TRACK_1 = scale_image(pygame.image.load('./assets/track1.png'), 1)
-TRACK_1_LIMITS = scale_image(pygame.image.load('./assets/track1_limits.png'), 1)
+TRACK_1 = scale_image(pygame.image.load('./assets/track1.png'), 1.2)
+TRACK_1_LIMITS = scale_image(pygame.image.load('./assets/track1_limits.png'), 1.2)
 TRACK_1_TILE = pygame.image.load('./assets/track1_tile.png')
 TRACK_2 = pygame.image.load('./assets/track2.png')
 TRACK_2_LIMITS = pygame.image.load('./assets/track2_limits.png')

@@ -3,8 +3,14 @@
 import sys
 import time
 
+import pygame.constants
+import pygame.display
+import pygame.event
+import pygame.key
+import pygame.mouse
 import pygame.time
-from pygame import Surface
+from pygame.surface import Surface
+from pygame.mask import MaskType
 
 from cars import COLLISION_POINTS, calculate_vel_factor, PlayerCar, ComputerCar
 from images import FINISH_LINE, FLAG_FINISH, FLAG_PENALTY, LIGHTS, TRACK_1, TRACK_2, TRACK_3, TRACK_1_LIMITS, \
@@ -14,21 +20,36 @@ from utils import GAME_INFO_FONT_SIZE, SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE,
     blit_screen, create_button, create_text, read_highscores_file, update_highscores_file
 
 # constants for the game
-TRACK_1_POSITION = (10, 10)
-TRACK_1_LIMITS_POSITION = (10, 10)
-TRACK_1_FINISH_LINE_POSITION = (535, 762)
+TRACK_1_POSITION = (-140, -20)
+TRACK_1_FINISH_LINE_POSITION = (535, 733)
+TRACK_2_POSITION = (10, 10)
+TRACK_2_FINISH_LINE_POSITION = (535, 762)
+TRACK_3_POSITION = (10, 10)
+TRACK_3_FINISH_LINE_POSITION = (535, 762)
 
 # set frames per second parameter
 FPS = 60
 CLOCK = pygame.time.Clock()
 
 TRACK_1_IMAGES = [
-    (TRACK_1_LIMITS, TRACK_1_LIMITS_POSITION),
+    (TRACK_1_LIMITS, TRACK_1_POSITION),
     (TRACK_1, TRACK_1_POSITION),
     (FINISH_LINE, TRACK_1_FINISH_LINE_POSITION)
 ]
+TRACK_2_IMAGES = [
+    (TRACK_2_LIMITS, TRACK_2_POSITION),
+    (TRACK_2, TRACK_2_POSITION),
+    (FINISH_LINE, TRACK_2_FINISH_LINE_POSITION)
+]
+TRACK_3_IMAGES = [
+    (TRACK_3_LIMITS, TRACK_3_POSITION),
+    (TRACK_3, TRACK_3_POSITION),
+    (FINISH_LINE, TRACK_3_FINISH_LINE_POSITION)
+]
 
 TRACK_1_LIMITS_MASK = pygame.mask.from_surface(TRACK_1_LIMITS)
+TRACK_2_LIMITS_MASK = pygame.mask.from_surface(TRACK_2_LIMITS)
+TRACK_3_LIMITS_MASK = pygame.mask.from_surface(TRACK_3_LIMITS)
 FINISH_LINE_MASK = pygame.mask.from_surface(FINISH_LINE)
 
 
@@ -84,11 +105,11 @@ class Game:
 
         for i in range(len(lights)):
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.constants.QUIT:
                     self.end_game()
                     sys.exit()
 
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                if event.type == pygame.constants.KEYDOWN and event.key == pygame.constants.K_ESCAPE:
                     return
 
             self.game_window.blit(lights[i],(x_pos, y_pos))
@@ -117,14 +138,14 @@ class Game:
 
         while not started:
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.constants.QUIT:
                     self.end_game()
                     sys.exit()
 
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                if event.type == pygame.constants.KEYDOWN and event.key == pygame.constants.K_ESCAPE:
                     return
 
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                if event.type == pygame.constants.KEYDOWN and event.key == pygame.constants.K_SPACE:
                     started = True
 
         self.count_to_start_race()
@@ -132,12 +153,11 @@ class Game:
         self.game_start_time = current_time
         self.player.lap_start_time = current_time
 
-    def end_game(self) -> None:
-        # for i in range(len(self.opponents)):
-        #     print(f'Opponent {i + 1}: ', self.opponents[i].completed_laps)
-        #
-        #     # # code to display computer car's path in console to be able to copy it for PATH variable
-        #     # print(opponents[i].path)
+    def end_game(self, index: int = 0) -> None:
+
+        # code to display computer car's path in console to be able to copy it for PATH variable
+        if self.opponents:
+            print(self.opponents[index].path)
 
         self.reset()
 
@@ -149,6 +169,33 @@ class Game:
         self.game_total_time = current_time
 
         return current_time
+
+    def generate_path_for_computer_car(self) -> None:
+        pressed_keys = pygame.key.get_pressed()
+        mouse_pos = pygame.mouse.get_pos()
+
+        for event in pygame.event.get():
+            if event.type == pygame.constants.MOUSEBUTTONDOWN:
+                print(mouse_pos)
+
+            # code to generate points for computer car path
+            if event.type == pygame.constants.KEYDOWN:
+                if pressed_keys[pygame.constants.K_x]:
+
+                    # display player position to better tune computer car's path
+                    print((self.player.x_pos, self.player.y_pos))
+
+
+                if self.opponents:
+                    # select index of computer car for which you want to create path
+                    i = 0
+
+                    if pressed_keys[pygame.constants.K_z]:
+                        self.opponents[i].path.append((self.player.x_pos, self.player.y_pos))
+
+                    # code to delete last path point
+                    if pressed_keys[pygame.constants.K_c]:
+                        self.opponents[i].path.pop()
 
     def run(self) -> None:
         self.start_game()
@@ -162,11 +209,10 @@ class Game:
             self.draw()
             self.move_player()
             self.generate_path_for_computer_car()
-            self.handle_out_of_track()
-            self.handle_finish_line_crossing()
+            self.determine_track_specific_conditions()
 
             if self.player.out_of_track:
-                self.determine_penalty(self.time_out_of_track)
+                self.determine_penalty(self.settings.selected_track_name, self.time_out_of_track)
                 if self.penalty:
                     self.display_penalty_text(self.penalty)
                     self.player.score -= 50
@@ -189,11 +235,11 @@ class Game:
         self.display_info()
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.constants.QUIT:
                 self.end_game()
                 sys.exit()
 
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            if event.type == pygame.constants.KEYDOWN and event.key == pygame.constants.K_ESCAPE:
                 self.end_game()
 
         if self.player.out_of_track:
@@ -206,7 +252,7 @@ class Game:
 
         pygame.display.update()
 
-    def draw_track(self, track_name: str = 'TRACK 1') -> None:
+    def draw_track(self, track_name: str) -> None:
         if track_name == 'TRACK 1':
             for img, pos in TRACK_1_IMAGES:
                 self.game_window.blit(img, pos)
@@ -221,38 +267,49 @@ class Game:
         keys = pygame.key.get_pressed()
         moved = False
 
-        if keys[pygame.K_w]:
+        if keys[pygame.constants.K_w]:
             moved = True
             self.player.move_forward()
-            if keys[pygame.K_a]:
+            if keys[pygame.constants.K_a]:
                 self.player.rotate(left=True)
-            elif keys[pygame.K_d]:
+            elif keys[pygame.constants.K_d]:
                 self.player.rotate(right=True)
-        elif keys[pygame.K_s]:
+        elif keys[pygame.constants.K_s]:
             moved = True
             if self.player.vel <= 0:
                 self.player.reverse()
-                if keys[pygame.K_a]:
+                if keys[pygame.constants.K_a]:
                     self.player.rotate(right=True)
-                elif keys[pygame.K_d]:
+                elif keys[pygame.constants.K_d]:
                     self.player.rotate(left=True)
             else:
                 self.player.brake()
-                if keys[pygame.K_a]:
+                if keys[pygame.constants.K_a]:
                     self.player.rotate(left=True)
-                elif keys[pygame.K_d]:
+                elif keys[pygame.constants.K_d]:
                     self.player.rotate(right=True)
 
         if not moved:
             self.player.reduce_speed()
             if self.player.vel != 0:
-                if keys[pygame.K_a]:
+                if keys[pygame.constants.K_a]:
                     self.player.rotate(left=True)
-                elif keys[pygame.K_d]:
+                elif keys[pygame.constants.K_d]:
                     self.player.rotate(right=True)
 
-    def handle_out_of_track(self) -> None:
-        if self.player.collide(TRACK_1_LIMITS_MASK, *TRACK_1_LIMITS_POSITION) is None:
+    def determine_track_specific_conditions(self) -> None:
+        if self.settings.selected_track_name == 'TRACK 1':
+            self.handle_out_of_track(TRACK_1_LIMITS_MASK, TRACK_1_POSITION)
+            self.handle_finish_line_crossing(TRACK_1_FINISH_LINE_POSITION)
+        elif self.settings.selected_track_name == 'TRACK 2':
+            self.handle_out_of_track(TRACK_2_LIMITS_MASK, TRACK_2_POSITION)
+            self.handle_finish_line_crossing(TRACK_2_FINISH_LINE_POSITION)
+        elif self.settings.selected_track_name == 'TRACK 3':
+            self.handle_out_of_track(TRACK_3_LIMITS_MASK, TRACK_3_POSITION)
+            self.handle_finish_line_crossing(TRACK_3_FINISH_LINE_POSITION)
+
+    def handle_out_of_track(self, track_limits_mask: MaskType, track_limits_pos: tuple[int, int]) -> None:
+        if self.player.collide(track_limits_mask, *track_limits_pos) is None:
             self.player.out_of_track = True
 
             if self.start_time_out_of_track == 0.0:
@@ -264,9 +321,9 @@ class Game:
             self.start_time_out_of_track = 0.0
             self.time_out_of_track = 0.0
 
-    def handle_finish_line_crossing(self) -> None:
+    def handle_finish_line_crossing(self, track_finish_line_pos: tuple[int, int]) -> None:
         for key, opponent in self.opponents.items():
-            opponent_finish_line_poi = opponent.collide(FINISH_LINE_MASK, *TRACK_1_FINISH_LINE_POSITION)
+            opponent_finish_line_poi = opponent.collide(FINISH_LINE_MASK, *track_finish_line_pos)
 
             if opponent_finish_line_poi is not None:
                 opponent.crossed_line = True
@@ -277,7 +334,7 @@ class Game:
                     opponent.completed_laps += 1
                     opponent.crossed_line = False
 
-        player_finish_line_poi = self.player.collide(FINISH_LINE_MASK, *TRACK_1_FINISH_LINE_POSITION)
+        player_finish_line_poi = self.player.collide(FINISH_LINE_MASK, *track_finish_line_pos)
 
         if player_finish_line_poi is not None:
             if player_finish_line_poi[0] > 0:
@@ -294,30 +351,6 @@ class Game:
                 self.player.lap_times.append(round(current_time - self.player.lap_start_time, 3))
                 self.player.lap_start_time = current_time
                 self.player.crossed_line = False
-
-    def generate_path_for_computer_car(self) -> None:
-        pressed_keys = pygame.key.get_pressed()
-        mouse_pos = pygame.mouse.get_pos()
-
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                print(mouse_pos)
-
-            # code to generate points for computer car path
-            if event.type == pygame.KEYDOWN:
-                if pressed_keys[pygame.K_x]:
-
-                    # display player position to better tune computer car's path
-                    print((self.player.x_pos, self.player.y_pos))
-
-                    # # select index of computer car for which you want to create path
-                    # i = 0
-                    # self.opponents[i].path.append((self.player.x_pos, self.player.y_pos))
-                    #
-            # # code to delete last path point
-            # if event.type == pygame.KEYDOWN:
-            #     if pressed_keys[pygame.K_c]:
-            #         self.opponents[i].path.pop()
 
     def get_best_lap(self) -> float | None:
         self.player.find_best_lap()
@@ -396,7 +429,7 @@ class Game:
         )
 
     def show_results(self) -> None:
-        box = pygame.Surface((400, 450), masks=(0, 0, 0))
+        box = Surface((400, 450), masks=(0, 0, 0))
         self.game_window.blit(box, (200, 200))
         pygame.display.update()
 
@@ -419,14 +452,14 @@ class Game:
             back_button.update(self.game_window)
 
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.constants.QUIT:
                     self.end_game()
                     sys.exit()
 
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                if event.type == pygame.constants.KEYDOWN and event.key == pygame.constants.K_ESCAPE:
                     self.end_game()
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.type == pygame.constants.MOUSEBUTTONDOWN:
                     if back_button.check_for_input(mouse_pos):
                         self.end_game()
 
@@ -536,9 +569,9 @@ class Game:
             position=(400, 400)
         )
 
-    def determine_penalty(self, time_out_of_track: float = 0.0) -> None:
+    def determine_penalty(self, track_name: str, time_out_of_track: float = 0.0) -> None:
         if self.settings.penalties == 'ON':
-            if self.player.corner_cut(COLLISION_POINTS['TRACK 1']):
+            if self.player.corner_cut(COLLISION_POINTS[track_name]):
                 self.penalty = True
 
                 return
