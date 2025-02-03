@@ -13,7 +13,7 @@ from pygame.surface import Surface
 from game import Game
 from images import CAR_1, CAR_2, CAR_3, CAR_4, CAR_5, CAR_6, CAR_7, CAR_8, CAR_1_BIG, CAR_2_BIG, CAR_3_BIG, \
     CAR_4_BIG, CAR_5_BIG, CAR_6_BIG, CAR_7_BIG, CAR_8_BIG, CUP, TRACK_1, TRACK_2, TRACK_3, TRACK_1_TILE, \
-    TRACK_2_TILE, TRACK_3_TILE
+    TRACK_2_TILE, TRACK_3_TILE, FLAG_FINISH
 from settings import CAR_NAMES, CARS, LAPS, OPPONENTS, OPPONENTS_LEVEL, PENALTIES, STARTING_POSITIONS, TRACKS, \
     TRACK_NAMES, Settings
 from utils import GAME_INFO_FONT_SIZE, MAIN_FONT_SIZE, SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE, TITLE_FONT_SIZE, \
@@ -37,19 +37,20 @@ class Menu:
             self.create_header(
                 font_size=MAIN_FONT_SIZE,
                 text='FORMULA',
-                position=(500, 125),
+                position=(self.game_window.get_width() / 2, 125),
             )
             self.create_header(
                 font_size=MAIN_FONT_SIZE,
                 text='CHAMPIONS',
-                position=(500, 200),
+                position=(self.game_window.get_width() / 2, 200),
             )
             self.create_header(
                 font_size=MAIN_FONT_SIZE,
                 text='RACING',
-                position=(500, 275),
+                position=(self.game_window.get_width() / 2, 275),
             )
-            self.game_window.blit(scale_image(CUP, 2), (50, 90))
+            self.game_window.blit(scale_image(CUP, 2), (self.game_window.get_width() / 2 - 450, 90))
+            self.game_window.blit(scale_image(CUP, 2), (self.game_window.get_width() / 2 + 250, 90))
 
             mouse_pos = pygame.mouse.get_pos()
             buttons = self.create_main_menu_buttons()
@@ -91,7 +92,7 @@ class Menu:
             font_size: int = TITLE_FONT_SIZE,
             text: str = 'HEADER',
             color: str = '#b68f40',
-            position: tuple[int, int] = (400, 100),
+            position: tuple[int, int] = (500, 100),
             positioning: str = 'center'
     ) -> None:
         create_text(
@@ -121,13 +122,17 @@ class Menu:
             self.game_window.fill('black')
             mouse_pos = pygame.mouse.get_pos()
 
-            self.create_header(font_size=MAIN_FONT_SIZE, text='HIGHSCORES', position=(400, 75))
+            self.create_header(
+                font_size=MAIN_FONT_SIZE,
+                text='HIGHSCORES',
+                position=(self.game_window.get_width() / 2, 75)
+            )
             self.create_highscores_labels()
 
             for i in range(len(highscores)):
                 self.create_highscores_row(highscores[i], i + 1)
 
-            back_button = self.create_back_button()
+            back_button = self.create_back_button((self.game_window.get_width() / 2 - 275, 700))
             back_button.change_color(mouse_pos)
             back_button.update(self.game_window)
 
@@ -150,11 +155,14 @@ class Menu:
 
         while self.set_options:
             self.game_window.fill('black')
-            self.create_header(font_size=MAIN_FONT_SIZE, text='SETTINGS', position=(400, 100))
+            self.create_header(
+                font_size=MAIN_FONT_SIZE,
+                text='SETTINGS',
+                position=(self.game_window.get_width() / 2, 100))
             self.create_settings_items()
 
             buttons = self.create_settings_buttons()
-            buttons['back'] = self.create_back_button()
+            buttons['back'] = self.create_back_button((self.game_window.get_width() / 2 - 275, 700))
             mouse_pos = pygame.mouse.get_pos()
 
             for button in buttons.values():
@@ -285,7 +293,7 @@ class Menu:
         self.main_menu()
 
     def create_highscores_labels(self) -> None:
-        left_pos = 40
+        left_pos = self.game_window.get_width() / 2 - 360
         top_pos = 150
         interval = 100
 
@@ -333,7 +341,7 @@ class Menu:
         )
 
     def create_highscores_row(self, data: list[int | str], row_number: int) -> None:
-        left_pos = 40
+        left_pos = self.game_window.get_width() / 2 - 360
         top_pos = 150 + 60 * row_number
         interval = 100
 
@@ -371,8 +379,8 @@ class Menu:
         )
 
     def create_settings_items(self) -> None:
-        left_pos = 450
-        right_pos = 600
+        left_pos = self.game_window.get_width() / 2 + 50
+        right_pos = self.game_window.get_width() / 2 + 200
         top_pos = 250
         interval = 50
 
@@ -396,7 +404,7 @@ class Menu:
             position=(left_pos, top_pos + interval),
             positioning='midright'
         )
-        self.display_car(pos=(580, 290))
+        self.display_car(pos=(self.game_window.get_width() / 2 + 180, 290))
         create_text(
             self.game_window,
             SELECTION_FONT_SIZE,
@@ -404,7 +412,7 @@ class Menu:
             position=(left_pos, top_pos + interval * 2),
             positioning='midright'
         )
-        self.display_track(pos=(565, 320))
+        self.display_track(pos=(self.game_window.get_width() / 2 + 165, 320))
         create_text(
             self.game_window,
             SELECTION_FONT_SIZE,
@@ -523,9 +531,8 @@ class Menu:
             elif track_name == 'TRACK 3':
                 self.game_window.blit(TRACK_3_TILE, pos)
 
-    @staticmethod
-    def create_main_menu_buttons() -> dict[str, Button]:
-        x_pos = 400
+    def create_main_menu_buttons(self) -> dict[str, Button]:
+        x_pos = self.game_window.get_width() / 2
         y_pox_top = 425
         interval = 80
 
@@ -552,10 +559,9 @@ class Menu:
             )
         }
 
-    @staticmethod
-    def create_settings_buttons() -> dict[str, Button]:
-        left_pos = 500
-        right_pos = 700
+    def create_settings_buttons(self) -> dict[str, Button]:
+        left_pos = self.game_window.get_width() / 2 + 100
+        right_pos = self.game_window.get_width() / 2 + 300
         top_pos = 300
         interval = 50
 
@@ -634,7 +640,7 @@ class Menu:
 
     @staticmethod
     def create_back_button(
-            position: tuple[int, int] = (125, 700),
+            position: tuple[int, int],
             font_size: int = SECONDARY_FONT_SIZE
     ) -> Button:
         return create_button(

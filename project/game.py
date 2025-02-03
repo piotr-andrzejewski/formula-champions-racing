@@ -20,8 +20,8 @@ from utils import GAME_INFO_FONT_SIZE, SECONDARY_FONT_SIZE, SELECTION_FONT_SIZE,
     blit_screen, create_button, create_text, read_highscores_file, update_highscores_file
 
 # constants for the game
-TRACK_1_POSITION = (-140, -20)
-TRACK_1_FINISH_LINE_POSITION = (535, 733)
+TRACK_1_POSITION = (-40, -20)
+TRACK_1_FINISH_LINE_POSITION = (635, 733)
 TRACK_2_POSITION = (-45, -50)
 TRACK_2_FINISH_LINE_POSITION = (755, 583)
 TRACK_3_POSITION = (-140, -80)
@@ -99,7 +99,7 @@ class Game:
         return opponents
 
     def count_to_start_race(self, lights: dict[int, Surface] = LIGHTS) -> None:
-        x_pos = 350
+        x_pos = self.game_window.get_width() / 2 - 50
         y_pos = 350
         self.game_window.fill((0, 70, 0))
         self.draw()
@@ -132,7 +132,7 @@ class Game:
             SECONDARY_FONT_SIZE,
             "PRESS SPACE KEY TO START",
             color='#b68f40',
-            position=(400, 400)
+            position=(self.game_window.get_width() / 2, self.game_window.get_height() / 2)
         )
         pygame.display.update()
         started = False
@@ -453,8 +453,8 @@ class Game:
         )
 
     def show_results(self) -> None:
-        box = Surface((400, 450), masks=(0, 0, 0))
-        self.game_window.blit(box, (200, 200))
+        box = Surface((self.game_window.get_width() / 2 - 100, 450), masks=(0, 0, 0))
+        self.game_window.blit(box, (self.game_window.get_width() / 2 - 200, 200))
         pygame.display.update()
 
         self.get_best_lap()
@@ -464,11 +464,11 @@ class Game:
 
         while self.started:
             self.create_results_texts()
-            self.game_window.blit(FLAG_FINISH, (470, 225))
+            self.game_window.blit(FLAG_FINISH, (self.game_window.get_width() / 2 + 70, 225))
 
             mouse_pos = pygame.mouse.get_pos()
             back_button = create_button(
-                position=(400, 600),
+                position=(self.game_window.get_width() / 2, 600),
                 text='BACK',
                 font_size=SELECTION_FONT_SIZE,
             )
@@ -490,10 +490,26 @@ class Game:
             pygame.display.update()
 
     def display_info(self) -> None:
-        left_pos = 720
-        right_pos = 785
+        left_pos = self.game_window.get_width() / 2 + 320
+        right_pos = self.game_window.get_width() / 2 + 385
         top_pos = 100
         interval = 30
+        gp_name = ''
+
+        if self.settings.selected_track_name == 'TRACK 1':
+            gp_name = 'HUNGARIAN GP'
+        elif self.settings.selected_track_name == 'TRACK 2':
+            gp_name = 'ITALIAN GP'
+        elif self.settings.selected_track_name == 'TRACK 3':
+            gp_name = 'BRAZILIAN GP'
+
+        create_text(
+            self.game_window,
+            SECONDARY_FONT_SIZE,
+            gp_name,
+            position=(right_pos, top_pos - 50),
+            positioning='midright'
+        )
         create_text(
             self.game_window,
             GAME_INFO_FONT_SIZE,
@@ -581,7 +597,7 @@ class Game:
             SECONDARY_FONT_SIZE,
             'GET BACK TO TRACK',
             color='#b68f40',
-            position=(400, 400)
+            position=(self.game_window.get_width() / 2, self.game_window.get_height() / 2)
         )
 
     def display_wrong_way_text(self) -> None:
@@ -590,7 +606,7 @@ class Game:
             SECONDARY_FONT_SIZE,
             'WRONG WAY',
             color='#b68f40',
-            position=(400, 400)
+            position=(self.game_window.get_width() / 2, self.game_window.get_height() / 2)
         )
 
     def determine_penalty(self, track_name: str, time_out_of_track: float = 0.0) -> None:
@@ -621,12 +637,13 @@ class Game:
             SECONDARY_FONT_SIZE,
             'PENALTY',
             color='#b68f40',
-            position=(400, 300)
+            position=(self.game_window.get_width() / 2, 300)
         )
-        self.game_window.blit(FLAG_PENALTY, (525, 265))
+        self.game_window.blit(FLAG_PENALTY, (self.game_window.get_width() / 2 + 125, 265))
 
     def create_results_texts(self) -> None:
-        left_pos, right_pos = 225, 575
+        left_pos = self.game_window.get_width() / 2 - 175
+        right_pos = self.game_window.get_width() / 2 + 175
         top_pos = 335
         interval = 50
         create_text(

@@ -85,14 +85,6 @@ def blit_rotate_center(window: Surface, img: Surface, top_left: tuple[float, flo
     window.blit(rotated_image, new_rect.topleft)
 
 
-def blit_text_center(window: Surface, font: pygame.font, text: str) -> None:
-    render = font.render(text, 1, (200, 200, 200))
-    window.blit(
-        render,
-        (window.get_width() / 2 - render.get_width() / 2, window.get_height() / 2 - render.get_height() / 2)
-    )
-
-
 def get_font(size: int) -> pygame.font.Font:
     return pygame.font.Font('./assets/Space_Bd_BT_Bold.ttf', size)
 
