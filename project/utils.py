@@ -25,7 +25,7 @@ class Button:
     def __init__(
             self,
             text_input: str,
-            position: tuple[int, int],
+            position: tuple[float, float],
             font: pygame.font.Font,
             base_color: str,
             hover_color: str,
@@ -58,7 +58,7 @@ class Button:
 
 
 def create_button(
-        position: tuple[int, int],
+        position: tuple[float, float],
         text: str,
         font_size: int,
         base_color: str = '#d7fcd4',
@@ -108,7 +108,7 @@ def create_text(
         font_size: int = MAIN_FONT_SIZE,
         text: str = 'SAMPLE TEXT',
         color: str = '#d7fcd4',
-        position: tuple[int, int] = (400, 400),
+        position: tuple[float, float] = (400, 400),
         positioning: str = 'center'
 ) -> None:
     text = get_font(font_size).render(text, True, color)
