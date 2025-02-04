@@ -30,6 +30,15 @@ Po przejechaniu linii mety graczowi przyznawane są punkty w zależności od kil
 - Z poziomu menu głównego istnieje możliwość wyświetlenia tablicy wyników, która zawiera 
 maksymalnie 8 najlepszych wyników.
 
+### WYMAGANIA WSTĘPNE
+
+Aby uruchomić grę należy mieć zainstalowany python w wersji przynajmniej 3.12.
+Po pobraniu kodu źródłowego lub sklonowaniu repozytorium z grą zalecane jest utworzenie wirtualnego środowiska
+za pomocą polecenia `python -m venv .venv`, a następnie aktywowanie tego środowiska za pomocą odpowiedniego polecenia
+(zobacz [uruchomienie wirtualnego środowiska](https://docs.python.org/3/library/venv.html#how-venvs-work)).
+Po aktywacji wirtualnego środowiska należy zainstalować pakiety wymagane do działania gry za pomocą polecenia
+`python -m pip install -r requirements.txt`. Listę pakietów można podejrzeć przeglądając plik [requirements.txt](requirements.txt)
+
 ### ROZGRYWKA
 
 - #### MENU GŁÓWNE
