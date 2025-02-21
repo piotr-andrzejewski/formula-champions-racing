@@ -1,24 +1,17 @@
+# PROJEKT GRY WYŚCIGOWEJ - *FORMULA CHAMPIONS RACING*
 
-# Wstęp do programowania
-
-## Piotr Andrzejewski
-
-### Nr indeksu: 300873
-
-## PROJEKT GRY WYŚCIGOWEJ - *FORMULA CHAMPIONS RACING*
-
-### OPIS GRY
+## OPIS GRY
 
 - *FORMULA CHAMPIONS RACING* to jednoosobowa gra wyścigowa przypominająca wyścigi Formuły 1.
  Gracz może rozpocząć grę z ustawieniami domyślnymi (kliknięcie *PLAY*) lub wybrać opcje po przejściu na ekran ustawień (*SETTINGS*).
-W menu ustawień gracz może wpisać swoją ksywkę (*NICKNAME*), wybrać bolid (w grze dostępnych jest osiem różnych modeli, które różnią się osiągami - zobacz sekcję [punktowanie](#punktowanie)), 
+W menu ustawień gracz może wpisać swoją ksywkę (*NICKNAME*), wybrać bolid (w grze dostępnych jest osiem różnych modeli, które różnią się osiągami - zobacz sekcję [punktowanie](#punktowanie)),
 tor, na którym chce się ścigać oraz ustawienia sesji:
-    - liczba okrążeń,
-    - liczba i poziom przeciwników,
-    - pozycja startowa (do wyboru jest konkretne miejsce, bądź pozycja losowa)
-    - przyznawanie kar:
-      - kara za ścinanie zakrętów
-      - kara za zbyt długie przebywanie poza torem
+  - liczba okrążeń,
+  - liczba i poziom przeciwników,
+  - pozycja startowa (do wyboru jest konkretne miejsce, bądź pozycja losowa)
+  - przyznawanie kar:
+    - kara za ścinanie zakrętów
+    - kara za zbyt długie przebywanie poza torem
 - W trakcie wyścigu mierzony jest czas całkowity wyścigu, jak również czasy poszczególnych okrążeń.
 Po przejechaniu linii mety graczowi przyznawane są punkty w zależności od kilku czynników (zobacz sekcję [punktowanie](#punktowanie)):
   - wybranego bolidu (im słabszy bolid, tym większy możliwy do uzyskania wynik)
@@ -30,7 +23,7 @@ Po przejechaniu linii mety graczowi przyznawane są punkty w zależności od kil
 - Z poziomu menu głównego istnieje możliwość wyświetlenia tablicy wyników, która zawiera 
 maksymalnie 8 najlepszych wyników.
 
-### WYMAGANIA WSTĘPNE
+## WYMAGANIA WSTĘPNE
 
 Aby uruchomić grę należy mieć zainstalowany python w wersji przynajmniej 3.12.
 Po pobraniu kodu źródłowego lub sklonowaniu repozytorium z grą zalecane jest utworzenie wirtualnego środowiska
@@ -39,12 +32,13 @@ za pomocą polecenia `python -m venv .venv`, a następnie aktywowanie tego środ
 Po aktywacji wirtualnego środowiska należy zainstalować pakiety wymagane do działania gry za pomocą polecenia
 `python -m pip install -r requirements.txt`. Listę pakietów można podejrzeć przeglądając plik [requirements.txt](requirements.txt)
 
-### ROZGRYWKA
+## ROZGRYWKA
 
-- #### MENU GŁÓWNE
+- ### MENU GŁÓWNE
 
 Po menu poruszamy się za pomocą myszki. Po najechaniu na przyciski zmienia się kolor ich wyświetlania.
 Przyciski dostępne w menu głównym:
+
 - *PLAY* - rozpoczyna nową grę z ustawieniami domyślnymi (zobacz sekcję [*GRA*](#gra))
 - *SETTINGS* - pozwala na wybór ustawień rozgrywki (zobacz sekcję [*USTAWIENIA*](#ustawienia))
 - *HIGHSCORES* - wyświetla tablicę 8 najlepszych wyników (zobacz sekcję [*NAJLEPSZE WYNIKI*](#najlepsze-wyniki))
@@ -53,11 +47,12 @@ Przyciski dostępne w menu głównym:
 ![menu.png](./assets/screenshots/menu.png)
 
 Zakończenie działania gry jest możliwe na trzy sposoby:
+
 1. naciśnięcie za pomocą myszy klawisza *X*, który zamyka okno programu
 2. naciśnięcie za pomocą myszy przycisku *QUIT*
 3. wciśnięcie klawisza *ESCAPE*
 
-- #### GRA
+- ### GRA
 
 Po wybraniu opcji *PLAY* z menu głównego wyświetlana jest właściwa gra.
 
@@ -81,9 +76,10 @@ Aby przejść do menu głównego należy kliknąć przycisk *BACK* lub nacisną�
 
 W każdym momencie można przerwać wyścig i powrócić do głównego menu. Służy do tego klawisz *ESCAPE*.
 
-##### STEROWANIE
+#### STEROWANIE
 
 Do sterowania bolidem służą następujące klawisze:
+
 - w: przyspieszanie
 - s: hamowanie, po całkowitym zatrzymaniu jazda do tylu
 - a: skręt w lewo
@@ -92,12 +88,13 @@ Do sterowania bolidem służą następujące klawisze:
 **UWAGA** Po całkowitym zatrzymaniu bolidu nie możliwe jest skręcanie - aby móc skręcić należy
 posłużyć się przyciskiem *w* lub *s*, aby rozpędzić bolid, a następnie używać klawiszy *a* lub *d*, aby skręcać.
 
-- #### USTAWIENIA
+- ### USTAWIENIA
 
 Po menu poruszamy się za pomocą myszki. Ekran ustawień zawiera etykiety oraz przyciski
 służące do wyboru poszczególnych opcji, a także pole tekstowe do wpisania swojej ksywki (domyślna wartość *PLAYER 1* 
 \- wprowadzić można maksymalnie 10 znaków).
-<br><br>Zakresy dostępnych opcji:
+\\Zakresy dostępnych opcji:
+
 - *CAR* - 8 bolidów
 - *TRACK* - 3 tory
 - *LAPS* - od 1 do 10
@@ -115,7 +112,7 @@ Na dole po lewej stronie ekranu znajduje się przycisk *BACK*, który służy do
 do menu głównego (funkcję powrotu do poprzedniego menu można również zrealizować poprzez
 naciśnięcie klawisza *ESCAPE*)
 
-- #### NAJLEPSZE WYNIKI
+- ### NAJLEPSZE WYNIKI
 
 Na ekranie z najlepszymi wynikami wyświetlanych jest maksymalnie 8 najlepszych wyników
 uzyskanych z rozegranych gier. Przykładowy ekran najlepszych wyników przedstawiono poniżej.
@@ -126,22 +123,23 @@ Po zakończeniu wyścigu, jego wynik wraz z danymi o wybranym bolidzie, torze, n
 informacja czy wybrano przyznawanie kar, zapisywany jest do pliku *scores.csv*. Następnie dane są odczytywane
 i użytkownikowi zostaje wyświetlonych maksymalnie osiem najlepszych wyników na ekranie.
 
-##### PUNKTOWANIE
+#### PUNKTOWANIE
 
 Przyznawanie punktów uwzględnia następujące zmienne:
+
 - współczynnik związany z bolidami:
-  <br>![car1_big.png](./assets/car1_big.png) współczynnik szybkości wynosi 0.96 
-  <br>![car2_big.png](./assets/car2_big.png) współczynnik szybkości wynosi 0.96 
-  <br>![car3_big.png](./assets/car3_big.png) współczynnik szybkości wynosi 1.0 
-  <br>![car4_big.png](./assets/car4_big.png) współczynnik szybkości wynosi 0.93 
-  <br>![car5_big.png](./assets/car5_big.png) współczynnik szybkości wynosi 0.98 
-  <br>![car6_big.png](./assets/car6_big.png) współczynnik szybkości wynosi 0.9 
-  <br>![car7_big.png](./assets/car7_big.png) współczynnik szybkości wynosi 0.91
-  <br>![car8_big.png](./assets/car8_big.png) współczynnik szybkości wynosi 0.93 
+  \![car1_big.png](./assets/car1_big.png) współczynnik szybkości wynosi 0.96 
+  \![car2_big.png](./assets/car2_big.png) współczynnik szybkości wynosi 0.96 
+  \![car3_big.png](./assets/car3_big.png) współczynnik szybkości wynosi 1.0 
+  \![car4_big.png](./assets/car4_big.png) współczynnik szybkości wynosi 0.93 
+  \![car5_big.png](./assets/car5_big.png) współczynnik szybkości wynosi 0.98 
+  \![car6_big.png](./assets/car6_big.png) współczynnik szybkości wynosi 0.9 
+  \![car7_big.png](./assets/car7_big.png) współczynnik szybkości wynosi 0.91
+  \![car8_big.png](./assets/car8_big.png) współczynnik szybkości wynosi 0.93 
 - współczynnik związany z torem:
-  <br>![track3_tile.png](./assets/track3_tile.png): współczynnik wyniku wynosi 1.0 
-  <br>![track2_tile.png](./assets/track2_tile.png): współczynnik wyniku wynosi 0.96
-  <br>![track1_tile.png](./assets/track1_tile.png): współczynnik wyniku wynosi 0.98
+  \![track3_tile.png](./assets/track3_tile.png): współczynnik wyniku wynosi 1.0 
+  \![track2_tile.png](./assets/track2_tile.png): współczynnik wyniku wynosi 0.96
+  \![track1_tile.png](./assets/track1_tile.png): współczynnik wyniku wynosi 0.98
 - współczynnik związany z poziomem przeciwników:
   - poziom 1: współczynnik wyniku wynosi 0.6
   - poziom 2: współczynnik wyniku wynosi 0.8
@@ -158,7 +156,7 @@ Przyznawanie punktów uwzględnia następujące zmienne:
   - VI: współczynnik wyniku wynosi 0.5
   - VII: współczynnik wyniku wynosi 0.4
   - VIII: współczynnik wyniku wynosi 0.3
-  <br> **UWAGA** W przypadku nie wybrania przeciwników współczynnik wyniku wynosi 0.5
+  \**UWAGA** W przypadku nie wybrania przeciwników współczynnik wyniku wynosi 0.5
 - współczynnik związany z czasem sumarycznym wyścigu:
   - mniejszy niż 45 s pomnożone przez liczbę okrążeń: współczynnik wyniku wynosi 1.0
   - mniejszy niż 60 s pomnożone przez liczbę okrążeń: współczynnik wyniku wynosi 0.75
@@ -168,6 +166,7 @@ Przyznawanie punktów uwzględnia następujące zmienne:
   - wyłączone: współczynnik wyniku wynosi 0.5
 
 Końcowy wynik przeliczany jest wg schematu:
+
 ```python
 score = round(
     1000
@@ -185,6 +184,7 @@ score = round(
     / 3
 )
 ```
-### Wersja 0.1
+
+## Wersja 0.1
 
 # Życzę udanej zabawy!
