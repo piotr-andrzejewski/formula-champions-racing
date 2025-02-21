@@ -91,9 +91,10 @@ posłużyć się przyciskiem *w* lub *s*, aby rozpędzić bolid, a następnie u�
 - ### USTAWIENIA
 
 Po menu poruszamy się za pomocą myszki. Ekran ustawień zawiera etykiety oraz przyciski
-służące do wyboru poszczególnych opcji, a także pole tekstowe do wpisania swojej ksywki (domyślna wartość *PLAYER 1* 
+służące do wyboru poszczególnych opcji, a także pole tekstowe do wpisania swojej ksywki (domyślna wartość *PLAYER 1*
 \- wprowadzić można maksymalnie 10 znaków).
-\\Zakresy dostępnych opcji:
+\
+Zakresy dostępnych opcji:
 
 - *CAR* - 8 bolidów
 - *TRACK* - 3 tory
@@ -128,18 +129,29 @@ i użytkownikowi zostaje wyświetlonych maksymalnie osiem najlepszych wyników n
 Przyznawanie punktów uwzględnia następujące zmienne:
 
 - współczynnik związany z bolidami:
-  \![car1_big.png](./assets/car1_big.png) współczynnik szybkości wynosi 0.96 
-  \![car2_big.png](./assets/car2_big.png) współczynnik szybkości wynosi 0.96 
-  \![car3_big.png](./assets/car3_big.png) współczynnik szybkości wynosi 1.0 
-  \![car4_big.png](./assets/car4_big.png) współczynnik szybkości wynosi 0.93 
-  \![car5_big.png](./assets/car5_big.png) współczynnik szybkości wynosi 0.98 
-  \![car6_big.png](./assets/car6_big.png) współczynnik szybkości wynosi 0.9 
-  \![car7_big.png](./assets/car7_big.png) współczynnik szybkości wynosi 0.91
-  \![car8_big.png](./assets/car8_big.png) współczynnik szybkości wynosi 0.93 
+\
+![car1_big.png](./assets/car1_big.png) współczynnik szybkości wynosi 0.96
+\
+![car2_big.png](./assets/car2_big.png) współczynnik szybkości wynosi 0.96
+\
+![car3_big.png](./assets/car3_big.png) współczynnik szybkości wynosi 1.0
+\
+![car4_big.png](./assets/car4_big.png) współczynnik szybkości wynosi 0.93
+\
+![car5_big.png](./assets/car5_big.png) współczynnik szybkości wynosi 0.98
+\
+![car6_big.png](./assets/car6_big.png) współczynnik szybkości wynosi 0.9
+\
+![car7_big.png](./assets/car7_big.png) współczynnik szybkości wynosi 0.91
+\
+![car8_big.png](./assets/car8_big.png) współczynnik szybkości wynosi 0.93
 - współczynnik związany z torem:
-  \![track3_tile.png](./assets/track3_tile.png): współczynnik wyniku wynosi 1.0 
-  \![track2_tile.png](./assets/track2_tile.png): współczynnik wyniku wynosi 0.96
-  \![track1_tile.png](./assets/track1_tile.png): współczynnik wyniku wynosi 0.98
+\
+![track3_tile.png](./assets/track3_tile.png) współczynnik wyniku wynosi 1.0
+\
+![track2_tile.png](./assets/track2_tile.png) współczynnik wyniku wynosi 0.96
+\
+![track1_tile.png](./assets/track1_tile.png) współczynnik wyniku wynosi 0.98
 - współczynnik związany z poziomem przeciwników:
   - poziom 1: współczynnik wyniku wynosi 0.6
   - poziom 2: współczynnik wyniku wynosi 0.8
@@ -156,7 +168,8 @@ Przyznawanie punktów uwzględnia następujące zmienne:
   - VI: współczynnik wyniku wynosi 0.5
   - VII: współczynnik wyniku wynosi 0.4
   - VIII: współczynnik wyniku wynosi 0.3
-  \**UWAGA** W przypadku nie wybrania przeciwników współczynnik wyniku wynosi 0.5
+\
+**UWAGA** W przypadku nie wybrania przeciwników współczynnik wyniku wynosi 0.5
 - współczynnik związany z czasem sumarycznym wyścigu:
   - mniejszy niż 45 s pomnożone przez liczbę okrążeń: współczynnik wyniku wynosi 1.0
   - mniejszy niż 60 s pomnożone przez liczbę okrążeń: współczynnik wyniku wynosi 0.75
